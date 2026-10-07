@@ -11,6 +11,7 @@ server.use(routeOrdem);
 AppDataSource.initialize()
     .then(() => {
     console.log("Banco de dados conectado com sucesso");
+    console.log("ENTIDADES:", AppDataSource.entityMetadatas.map(entity => entity.name));
 })
     .catch((err) => {
     console.log("Erro ao conectar com banco de dados", err);
