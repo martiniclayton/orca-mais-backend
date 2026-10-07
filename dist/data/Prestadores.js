@@ -1,6 +1,4 @@
-import { Prestador } from "../types/TypePrestador.js";
-
-export const prestadores: Prestador[] = [
+export const prestadores = [
     {
         nome: "João",
         cpf: "12345678900",
@@ -10,3 +8,4 @@ export const prestadores: Prestador[] = [
         senha: "123456"
     }
 ];
+//# sourceMappingURL=Prestadores.js.map

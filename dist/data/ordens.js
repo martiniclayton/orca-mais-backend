@@ -1,8 +1,4 @@
-import { TypeOrdem } from "../types/TypeOrdem.js";
-import { clientes } from "./clientes.js";
-
-export const ordenServicos: TypeOrdem[] = [
-
+export const ordenServicos = [
     {
         clienteId: 1,
         placa: "ABC-1234",
@@ -10,7 +6,6 @@ export const ordenServicos: TypeOrdem[] = [
         status: "Em andamento",
         tipoServico: "Troca de óleo"
     },
-
     {
         clienteId: 2,
         placa: "XYZ9876",
@@ -18,7 +13,6 @@ export const ordenServicos: TypeOrdem[] = [
         status: "Em andamento",
         tipoServico: "Revisão do sistema de freios"
     },
-
     {
         clienteId: 3,
         placa: "KGM4A88",
@@ -26,7 +20,6 @@ export const ordenServicos: TypeOrdem[] = [
         status: "Finalizado",
         tipoServico: "Diagnóstico elétrico"
     },
-
     {
         clienteId: 4,
         placa: "RST3D21",
@@ -34,5 +27,5 @@ export const ordenServicos: TypeOrdem[] = [
         status: "Em andamento",
         tipoServico: "Alinhamento e balanceamento"
     }
-
 ];
+//# sourceMappingURL=ordens.js.map

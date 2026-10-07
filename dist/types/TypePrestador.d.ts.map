@@ -1,0 +1,1 @@
+{"version":3,"file":"TypePrestador.d.ts","sourceRoot":"","sources":["../../src/types/TypePrestador.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,SAAS;IACtB,IAAI,EAAE,MAAM,CAAC;IACb,KAAK,EAAE,MAAM,CAAC;IACd,GAAG,EAAE,MAAM,CAAC;IACZ,QAAQ,EAAE,MAAM,CAAC;IACjB,eAAe,EAAE,MAAM,CAAA;IACvB,KAAK,EAAE,MAAM,CAAA;CAChB;AAED,MAAM,MAAM,aAAa,GAAG,IAAI,CAAC,SAAS,EAAE,IAAI,CAAC,CAAC"}
