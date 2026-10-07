@@ -16,7 +16,7 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts"
+    "start": "npx tsx src/server.ts"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
