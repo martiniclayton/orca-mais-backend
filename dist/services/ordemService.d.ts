@@ -11,4 +11,5 @@ export declare const getOrderUser: (codAcesso: string) => Promise<{
     cliente: Cliente;
     ordens: Ordens[];
 } | null>;
+export declare const loginClienteToken: (code: string, cpf: string) => Promise<string | null | undefined>;
 //# sourceMappingURL=ordemService.d.ts.map

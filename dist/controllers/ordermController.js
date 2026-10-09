@@ -1,4 +1,4 @@
-import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, getOrderUser, pegarTodasOrderns } from "../services/ordemService.js";
+import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, getOrderUser, loginClienteToken, pegarTodasOrderns } from "../services/ordemService.js";
 import { z } from "zod";
 export const getAllorders = async (request, response) => {
     const { ativas, status } = request.query;
@@ -85,18 +85,45 @@ export const deleteOrder = async (request, response) => {
 };
 export const getOrdersUser = async (request, response) => {
     const codigo = String(request.params.cod);
+    if (!codigo) {
+        return response.status(400).json({
+            mensagem: "Código do cliente não informado"
+        });
+    }
     const resultado = await getOrderUser(codigo);
     if (resultado) {
         const { cliente, ordens } = resultado;
-        response.json({
+        return response.json({
             cliente,
             ordens
         });
     }
     else {
-        response.json({
+        return response.json({
             mensagem: "ordens não encontradas"
         });
     }
+};
+const clienteSchema = z.object({
+    code: z.string(),
+    cpf: z.string()
+});
+export const loginCliente = async (request, response) => {
+    const cliente = clienteSchema.safeParse(request.body);
+    if (!cliente.success) {
+        return response.json({
+            mensagem: "Dados inválidos"
+        });
+    }
+    const { code, cpf } = cliente.data;
+    const resposta = await loginClienteToken(code, cpf);
+    if (!resposta) {
+        return response.status(400).json({
+            mensagem: "Cliente não encontrado"
+        });
+    }
+    return response.json({
+        token: resposta
+    });
 };
 //# sourceMappingURL=ordermController.js.map

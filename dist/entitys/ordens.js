@@ -7,12 +7,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cliente } from "./clientes.js";
+import { NotificacaoEntity } from "./notification.js";
 let Ordens = class Ordens {
     id;
     clienteId;
     cliente;
+    notificacao;
     placa;
     dataCriacao;
     tipoServico;
@@ -32,6 +34,10 @@ __decorate([
     JoinColumn({ name: "clienteId" }),
     __metadata("design:type", Cliente)
 ], Ordens.prototype, "cliente", void 0);
+__decorate([
+    OneToMany(() => NotificacaoEntity, notificacao => notificacao.ordens),
+    __metadata("design:type", Array)
+], Ordens.prototype, "notificacao", void 0);
 __decorate([
     Column({ type: "varchar" }),
     __metadata("design:type", String)
