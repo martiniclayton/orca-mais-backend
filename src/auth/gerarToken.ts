@@ -21,3 +21,22 @@ export const gerarToken = (payload: any) => {
      }
 
 }
+
+export const gerarTokenCliente = (payload: any) => {
+    const pay = {
+        id: payload.id,
+        nome: payload.nome
+    }
+
+    try{
+        const token = jwt.sign(pay, SECRETKEY, {
+            expiresIn: '1h'
+        });
+        
+        return token
+    }
+     catch (error){
+        console.log("erroe", error)
+     }
+
+}

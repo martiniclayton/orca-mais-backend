@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cliente } from "./clientes.js";
+import { NotificacaoEntity } from "./notification.js";
 
 @Entity("Ordens")
 export class Ordens {
@@ -12,6 +13,9 @@ export class Ordens {
     @ManyToOne(()=> Cliente, { eager: true})
     @JoinColumn({name: "clienteId"})
     cliente!: Cliente
+
+    @OneToMany(()=> NotificacaoEntity, notificacao => notificacao.ordens)
+    notificacao!: NotificacaoEntity[];
 
     @Column({type: "varchar"})
     placa!: string
