@@ -22,7 +22,7 @@ export class NotificacaoEntity {
     @Column({type: "varchar"})
     status!: string
 
-    @ManyToOne(()=> Ordens, ordem => ordem.notificacao, { onDelete: "CASCADE", eager: true})
+    @ManyToOne(()=> Ordens, (ordem: any) => ordem.notificacao, { onDelete: "CASCADE", eager: true})
     @JoinColumn({name: "ordemId"})
-    ordens!: Ordens
+    ordens!: any
 }
