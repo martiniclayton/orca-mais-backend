@@ -12,6 +12,7 @@
     "types": [],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
