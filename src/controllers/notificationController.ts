@@ -1,4 +1,4 @@
-import { getAllNotificationService } from "../services/notificationService.js"
+import { getAllNotificationService, getNotificationUserService } from "../services/notificationService.js"
 import { Request, Response } from 'express'
 
 export const getAllNotification = async (request: Request, response: Response) =>{
@@ -12,5 +12,17 @@ export const getAllNotification = async (request: Request, response: Response) =
 
     return response.json({
         resposta
+    })
+}
+
+export const getNotificationUser = async (request: Request, response: Response) =>{
+    const cod = String(request.params.cod)
+
+    const resposta = await getNotificationUserService(cod)
+
+
+    return response.json({
+        cod: cod,
+        ordens: resposta
     })
 }

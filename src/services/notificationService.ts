@@ -8,3 +8,17 @@ export const getAllNotificationService = async () =>{
 
     return notificacao
 }
+
+export const getNotificationUserService = async (cod: string) =>{
+    const notifications = notificacoesData.find({
+        where: {
+            ordens: {
+                cliente: {
+                    codAcesso: cod
+                }
+            }
+        }
+    })
+
+    return notifications
+}
