@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 
-const SECRETKEY = "333337776626632"
+const SECRETKEY = process.env.SECRET_KEY_JWT!;
 
 export const gerarToken = (payload: any) => {
     const pay = {
