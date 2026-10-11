@@ -35,7 +35,7 @@ export const criarPrestadorController = async (request: Request, response: Respo
     const user = prestadorSchema.safeParse(request.body);
 
     if(!user.success){
-        return response.json({
+        return response.status(400).json({
             mensagem: "Campos inválidos",
             erro: user.error.format()
         });
@@ -44,19 +44,24 @@ export const criarPrestadorController = async (request: Request, response: Respo
     const resposta = await criarPrestador(user.data);
 
     if(!resposta){
-        return response.json({
+        return response.status(409).json({
             mensagem: "Prestador já existe"
         })
     }
 
-    return response.json({
+    return response.status(200).json({
         mensagem: "Prestador cadastrado com sucesso",
-        prestador: user
     })
 }
 
 export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
     const prestadores = await pegarTodosPrestadores();
+
+    if(prestadores.length === 0){
+        return response.status(200).json({
+            mensagem: "Não existe nenhum prestador cadastrado"
+        })
+    }
 
     return response.json({
         prestadores
@@ -70,12 +75,12 @@ export const atualizarPrestadorController = async (request: Request, response: R
     const resposta = await atuaizarPrestador(id, user)
 
     if (resposta) {
-        return response.json({
+        return response.status(200).json({
             mensagem: "Prestador atualizado",
             prestador: user
         })
     } else {
-        return response.json({
+        return response.status(404).json({
             mensagem: "Usuário não encontrado"
         })
     }
@@ -87,11 +92,11 @@ export const deletarPrestadorController =  async (request: Request, response: Re
     const resposta = await deletarPrestador(id)
 
     if (resposta) {
-        return response.json({
+        return response.status(200).json({
             mensagem: "Prestador deletado com sucesso"
         })
     } else {
-        return response.json({
+        return response.status(404).json({
             mensagem: "Prestador nao encontrado"
         })
     }
@@ -101,6 +106,7 @@ export const loginControler = async (request: Request, response: Response) =>{
     const { email, senha } = request.body
 
     const resposta = await loginService(email, senha);
+    
     if(!resposta){
         return response.status(400).json({
             mensagem: "E-mail ou senha inválidos"
