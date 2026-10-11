@@ -1,3 +1,15 @@
+import "dotenv/config";
+
+const url = new URL(process.env.DATABASE_URL!);
+
+console.log({
+  protocolo: url.protocol,
+  hostname: url.hostname,
+  pathname: url.pathname,
+  sslmode: url.searchParams.get("sslmode"),
+});
+
+
 import express, { Request, Response } from 'express';
 import { Prestador } from './types/TypePrestador.js';
 import route from './routes/prestadorRoutes.js';
