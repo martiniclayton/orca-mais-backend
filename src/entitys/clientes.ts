@@ -11,7 +11,7 @@ export class Cliente {
     @Column({type: "varchar", unique: true, select: false})
     cpf!: string
 
-    @Column({type: "varchar", select: false})
+    @Column({type: "varchar", select: true})
     telefone!: string
 
     @Column({type: "varchar", select: true})
