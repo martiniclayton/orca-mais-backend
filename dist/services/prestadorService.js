@@ -78,7 +78,8 @@ export const loginService = async (email, senha) => {
         prestador: {
             id: prestador.id,
             nome: prestador.nome,
-            enail: prestador.email
+            enail: prestador.email,
+            estabelecimento: prestador.estabelecimento
         },
         token: token
     };

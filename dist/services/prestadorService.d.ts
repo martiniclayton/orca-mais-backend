@@ -10,6 +10,7 @@ export declare const loginService: (email: string, senha: string) => Promise<{
         id: number;
         nome: string;
         enail: string;
+        estabelecimento: string;
     };
     token: string | undefined;
 } | null | undefined>;
