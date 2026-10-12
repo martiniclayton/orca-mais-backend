@@ -2,6 +2,7 @@ import { gerarToken } from "../auth/gerarToken.js";
 import { AppDataSource } from "../DataSource.js";
 import { EntityPrestador } from "../entitys/Prestador.js";
 import { NovoPrestador, Prestador } from "../types/TypePrestador.js";
+import bcrypt from "bcryptjs";
 
 const prestadores = AppDataSource.getRepository(EntityPrestador)
 
@@ -21,6 +22,8 @@ export const criarPrestador = async (prestador: NovoPrestador) => {
     if (existente) {
         return null
     }
+    
+    const senhahash = await bcrypt.hash(senha, 10)
 
     const novoPrestador: Prestador = {
         nome: nome,
@@ -28,7 +31,7 @@ export const criarPrestador = async (prestador: NovoPrestador) => {
         cpf: cpf,
         telefone: telefone,
         estabelecimento: estabelecimento,
-        senha: senha
+        senha: senhahash
     }
 
     const newPrestador = prestadores.create(novoPrestador);
@@ -72,8 +75,7 @@ export const deletarPrestador = async (id: number) => {
 export const loginService = async (email: string, senha: string) => {
     const prestador = await prestadores.findOne({ 
         where: {
-            email,
-            senha
+            email
         },
         select:{
             id: false,
@@ -82,13 +84,19 @@ export const loginService = async (email: string, senha: string) => {
             cpf: false,
             telefone: false,
             estabelecimento: true,
-            senha: false
+            senha: true
         }
      })
 
 
      if(!prestador){
         return null
+     }
+
+     const senhaValida = await bcrypt.compare(senha, prestador.senha);
+
+     if(!senhaValida){
+        return
      }
 
     //  if(prestador.senha !== senha){
@@ -98,7 +106,11 @@ export const loginService = async (email: string, senha: string) => {
      const token = gerarToken(prestador)
 
      const user = {
-        prestador: prestador,
+        prestador: {
+            id: prestador.id,
+            nome: prestador.nome,
+            enail: prestador.email
+        },
         token: token
      }
 
