@@ -8,12 +8,12 @@ export class Cliente {
     @Column({type: "varchar"})
     nome!: string
 
-    @Column({type: "varchar", unique: true})
+    @Column({type: "varchar", unique: true, select: false})
     cpf!: string
 
-    @Column({type: "varchar"})
+    @Column({type: "varchar", select: false})
     telefone!: string
 
-    @Column({type: "varchar"})
+    @Column({type: "varchar", select: true})
     codAcesso!: string
 }

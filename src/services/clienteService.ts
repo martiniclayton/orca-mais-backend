@@ -16,7 +16,20 @@ export const gerarCodigoAleatorio = (): string => {
 };
 
 export const BuscarCliente = async (cpf: string)=>{
-    const user =  await clientesBanco.findOneBy({cpf});
+    // const user =  await clientesBanco.findOneBy({cpf});
+
+    const user = await clientesBanco.findOne({
+        where: {
+            cpf: cpf
+        },
+        select: {
+            id: true,
+            nome: true,
+            telefone: true,
+            cpf: true,
+            codAcesso: true
+        }
+    })
     return user
 }
 

@@ -72,7 +72,17 @@ export const deletarPrestador = async (id: number) => {
 export const loginService = async (email: string, senha: string) => {
     const prestador = await prestadores.findOne({ 
         where: {
-            email
+            email,
+            senha
+        },
+        select:{
+            id: false,
+            nome: true,
+            email: true,
+            cpf: false,
+            telefone: false,
+            estabelecimento: true,
+            senha: false
         }
      })
 
@@ -81,9 +91,9 @@ export const loginService = async (email: string, senha: string) => {
         return null
      }
 
-     if(prestador.senha !== senha){
-        return null
-     }
+    //  if(prestador.senha !== senha){
+    //     return null
+    //  }
 
      const token = gerarToken(prestador)
 

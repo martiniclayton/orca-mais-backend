@@ -8,6 +8,7 @@ import { NotificacaoEntity } from "../entitys/notification.js";
 import { StatusOS, TypeOrdem, TypeOrdemRequest } from "../types/TypeOrdem.js";
 import { BuscarCliente, CriarCliente } from "./clienteService.js";
 import { In, Not } from "typeorm";
+import { enviarEmailCodigoAcesso } from "./emailService.js";
 
 const ordensBanco = AppDataSource.getRepository(Ordens);
 export const clientesBanco = AppDataSource.getRepository(Cliente);
@@ -19,8 +20,8 @@ export const pegarTodasOrderns = async () => {
     const ordens = await ordensBanco.find({
             relations: {
                 cliente: true,
-                notificacao: true // <--- Se isso aqui não estiver aqui, o TypeORM não traz as notificações!
-            }
+                notificacao: true 
+            },
     })
 
     return ordens
@@ -88,6 +89,8 @@ export const adcOrdem = async (ordem: TypeOrdemRequest) => {
     })
 
     await notificationDate.save(criarNotificacao)
+
+    enviarEmailCodigoAcesso("teste@gmail.com", cliente?.nome, cliente?.codAcesso)
     return ordemSalva
 }
 

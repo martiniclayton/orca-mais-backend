@@ -23,12 +23,19 @@ export const buscarPrestadorPorIdController = async (request: Request, response:
 }
 
 const prestadorSchema = z.object({
-    nome: z.string(),
-    cpf: z.string(),
-    email: z.string(),
-    telefone: z.string(),
-    estabelecimento: z.string(),
-    senha: z.string()
+    nome: z.string().trim().min(2, "O nome deve ter pelo menos 2 caracteres"),
+    cpf: z.string().transform(valor => valor.replace(/\D/g, "")).pipe(z.string().regex(/^\d{11}$/, "CPF deve conter 11 dígitos")),
+    email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
+    telefone: z.string().transform(valor => valor.replace(/\D/g, ""))
+        .pipe(
+            z.string().regex(
+                /^\d{10,11}$/,
+                "Telefone deve conter 10 ou 11 dígitos"
+            )
+        ),
+    estabelecimento: z.string().trim()
+        .min(2, "Informe o nome do estabelecimento"),
+    senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
 })
 
 export const criarPrestadorController = async (request: Request, response: Response) => {
@@ -49,7 +56,7 @@ export const criarPrestadorController = async (request: Request, response: Respo
         })
     }
 
-    return response.status(200).json({
+    return response.status(201).json({
         mensagem: "Prestador cadastrado com sucesso",
     })
 }

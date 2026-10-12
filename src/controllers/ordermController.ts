@@ -16,7 +16,7 @@ export const getAllorders = async (request: Request, response: Response) => {
     }
 
 
-    const Ordens = await pegarTodasOrderns();
+    const Ordens = await pegarTodasOrderns();       
 
     if (Ordens.length === 0) {
         return response.json({

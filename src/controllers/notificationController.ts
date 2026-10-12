@@ -4,6 +4,12 @@ import { Request, Response } from 'express'
 export const getAllNotification = async (request: Request, response: Response) =>{
     const resposta = await getAllNotificationService()
 
+    if(resposta.length === 0){
+        return response.json({
+            mensagem: "Não existe nenhuma notificação cadastrada"
+        })
+    }
+
     if(!resposta){
         return response.json({
             mensagem: "Erro ao consultar notificação"
@@ -20,6 +26,11 @@ export const getNotificationUser = async (request: Request, response: Response) 
 
     const resposta = await getNotificationUserService(cod)
 
+    if(resposta.length === 0) {
+        return response.json({
+            mensagem: "Cliente não possui notificação"
+        })
+    }
 
     return response.json({
         cod: cod,
