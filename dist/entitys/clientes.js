@@ -24,15 +24,15 @@ __decorate([
     __metadata("design:type", String)
 ], Cliente.prototype, "nome", void 0);
 __decorate([
-    Column({ type: "varchar", unique: true }),
+    Column({ type: "varchar", unique: true, select: false }),
     __metadata("design:type", String)
 ], Cliente.prototype, "cpf", void 0);
 __decorate([
-    Column({ type: "varchar" }),
+    Column({ type: "varchar", select: true }),
     __metadata("design:type", String)
 ], Cliente.prototype, "telefone", void 0);
 __decorate([
-    Column({ type: "varchar" }),
+    Column({ type: "varchar", select: true }),
     __metadata("design:type", String)
 ], Cliente.prototype, "codAcesso", void 0);
 Cliente = __decorate([

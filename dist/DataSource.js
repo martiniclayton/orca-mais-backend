@@ -4,12 +4,15 @@ import { Ordens } from "./entitys/ordens.js";
 import { Cliente } from "./entitys/clientes.js";
 import { NotificacaoEntity } from "./entitys/notification.js";
 export const AppDataSource = new DataSource({
-    type: "better-sqlite3",
-    database: "database.sqlite",
+    type: "postgres",
+    ...(process.env.DATABASE_URL ? { url: process.env.DATABASE_URL } : {}),
     synchronize: true,
     logging: false,
     entities: [EntityPrestador, Ordens, Cliente, NotificacaoEntity],
     migrations: [],
     subscribers: [],
+    ssl: {
+        rejectUnauthorized: false,
+    },
 });
 //# sourceMappingURL=DataSource.js.map

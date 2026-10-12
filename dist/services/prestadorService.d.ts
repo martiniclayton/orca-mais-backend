@@ -6,7 +6,11 @@ export declare const pegarTodosPrestadores: () => Promise<EntityPrestador[]>;
 export declare const atuaizarPrestador: (id: number, novosDados: NovoPrestador) => Promise<EntityPrestador | null>;
 export declare const deletarPrestador: (id: number) => Promise<true | null>;
 export declare const loginService: (email: string, senha: string) => Promise<{
-    prestador: EntityPrestador;
+    prestador: {
+        id: number;
+        nome: string;
+        enail: string;
+    };
     token: string | undefined;
-} | null>;
+} | null | undefined>;
 //# sourceMappingURL=prestadorService.d.ts.map

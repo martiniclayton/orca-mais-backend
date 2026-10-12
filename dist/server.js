@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from 'express';
 import route from './routes/prestadorRoutes.js';
 import routeOrdem from './routes/ordensRoutes.js';

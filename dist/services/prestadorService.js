@@ -1,6 +1,7 @@
 import { gerarToken } from "../auth/gerarToken.js";
 import { AppDataSource } from "../DataSource.js";
 import { EntityPrestador } from "../entitys/Prestador.js";
+import bcrypt from "bcryptjs";
 const prestadores = AppDataSource.getRepository(EntityPrestador);
 export const buscarPrestador = async (id) => {
     const prestador = await prestadores.findOneBy({ id });
@@ -12,13 +13,14 @@ export const criarPrestador = async (prestador) => {
     if (existente) {
         return null;
     }
+    const senhahash = await bcrypt.hash(senha, 10);
     const novoPrestador = {
         nome: nome,
         email: email,
         cpf: cpf,
         telefone: telefone,
         estabelecimento: estabelecimento,
-        senha: senha
+        senha: senhahash
     };
     const newPrestador = prestadores.create(novoPrestador);
     return await prestadores.save(newPrestador);
@@ -50,17 +52,34 @@ export const loginService = async (email, senha) => {
     const prestador = await prestadores.findOne({
         where: {
             email
+        },
+        select: {
+            id: false,
+            nome: true,
+            email: true,
+            cpf: false,
+            telefone: false,
+            estabelecimento: true,
+            senha: true
         }
     });
     if (!prestador) {
         return null;
     }
-    if (prestador.senha !== senha) {
-        return null;
+    const senhaValida = await bcrypt.compare(senha, prestador.senha);
+    if (!senhaValida) {
+        return;
     }
+    //  if(prestador.senha !== senha){
+    //     return null
+    //  }
     const token = gerarToken(prestador);
     const user = {
-        prestador: prestador,
+        prestador: {
+            id: prestador.id,
+            nome: prestador.nome,
+            enail: prestador.email
+        },
         token: token
     };
     return user;
