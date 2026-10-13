@@ -44,7 +44,8 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
     } else {
         ordens = await ordensBanco.find({
             where: {
-                status: In(["Em andamento", "Pronto para retirada"])
+                status: In(["Em andamento", "Pronto para retirada"]),
+                prestadorId: prestadorId
             },
             select: {
                 cliente: {
