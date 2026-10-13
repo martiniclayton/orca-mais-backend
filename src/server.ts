@@ -18,25 +18,32 @@ server.use(routeOrdem)
 server.use(notificacaoRoutes)
 server.use(rotasCliente)
 
-AppDataSource.initialize()
-    .then(() => {
+const PORT = process.env.PORT || 3000;
+
+const iniciarServidor = async () => {
+    try {
+        await AppDataSource.initialize()
         console.log("Banco de dados conectado com sucesso")
         console.log(
             "ENTIDADES:",
             AppDataSource.entityMetadatas.map(entity => entity.name)
-        )
-    })
-    .catch((err) => {
-        console.log("Erro ao conectar com banco de dados", err)
-    })
+        );
+        
+        server.listen(PORT, () => {
+            console.log(`Servidor rodando em http://localhost:${PORT}`);
+        })
+    } catch(err){
+        console.log("Erro ao iniciar a aplicação", err);
+        process.exit
+
+    }
+}
+
+iniciarServidor();
 
 const prestadores: Prestador[] = []
 
-const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, () => {
-    console.log(`Servidor rodando em http://localhost:${PORT}`);
-})
 
 server.get('/', (request: Request, response: Response) => {
     response.json({
