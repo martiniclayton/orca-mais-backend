@@ -6,9 +6,9 @@ const SECRETKEY = process.env.SECRET_KEY_JWT!;
 export const gerarToken = (payload: any) => {
     const pay = {
         id: payload.id,
-        email: payload.email
+        email: payload.email,
+        tipo: "prestador"
     }
-
     try{
         const token = jwt.sign(pay, SECRETKEY, {
             expiresIn: '1h'
@@ -25,7 +25,8 @@ export const gerarToken = (payload: any) => {
 export const gerarTokenCliente = (payload: any) => {
     const pay = {
         id: payload.id,
-        nome: payload.nome
+        nome: payload.nome,
+        tipo: "cliente"
     }
 
     try{

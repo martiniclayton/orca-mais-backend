@@ -2,6 +2,8 @@ import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, getOrderUs
 import { z } from "zod";
 export const getAllorders = async (request, response) => {
     const { ativas, status } = request.query;
+    const prestadorId = Number(request.usuario?.id);
+    console.log(prestadorId);
     const statusValue = typeof status === "string" ? status : undefined;
     if (statusValue) {
         const resposta = await filtrarOrdensFinalizadas(statusValue);
@@ -10,7 +12,7 @@ export const getAllorders = async (request, response) => {
             ordens: resposta
         });
     }
-    const Ordens = await pegarTodasOrderns();
+    const Ordens = await pegarTodasOrderns(prestadorId);
     if (Ordens.length === 0) {
         return response.json({
             mensagem: "Nenhuma ordem cadastrada"
@@ -36,13 +38,14 @@ const ordemSchema = z.object({
 });
 export const pushOrder = async (request, response) => {
     const ordem = ordemSchema.safeParse(request.body);
+    const prestadorId = Number(request.usuario?.id);
     if (!ordem.success) {
         return response.json({
             mensagem: "Campos inválidos",
             erro: ordem.error.format()
         });
     }
-    const resposta = await adcOrdem(ordem.data);
+    const resposta = await adcOrdem(ordem.data, prestadorId);
     if (resposta) {
         return response.json({
             mensagem: "Ordem adicionada com sucesso",

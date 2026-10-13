@@ -4,7 +4,12 @@ import { TypeOrdemRequest } from "../types/TypeOrdem.js";
 import { z } from "zod";
 
 export const getAllorders = async (request: Request, response: Response) => {
-    const { ativas, status } = request.query
+
+    const { ativas, status } = request.query;
+    const prestadorId = Number(request.usuario?.id);
+
+    console.log(prestadorId);
+
     const statusValue = typeof status === "string" ? status : undefined
 
     if (statusValue) {
@@ -16,7 +21,7 @@ export const getAllorders = async (request: Request, response: Response) => {
     }
 
 
-    const Ordens = await pegarTodasOrderns();       
+    const Ordens = await pegarTodasOrderns(prestadorId);
 
     if (Ordens.length === 0) {
         return response.json({
@@ -43,6 +48,8 @@ const ordemSchema = z.object({
 })
 export const pushOrder = async (request: Request, response: Response) => {
     const ordem = ordemSchema.safeParse(request.body);
+    const prestadorId = Number(request.usuario?.id);
+
 
     if (!ordem.success) {
         return response.json({
@@ -51,7 +58,7 @@ export const pushOrder = async (request: Request, response: Response) => {
         })
     }
 
-    const resposta = await adcOrdem(ordem.data)
+    const resposta = await adcOrdem(ordem.data, prestadorId)
 
     if (resposta) {
         return response.json({
@@ -128,20 +135,20 @@ const clienteSchema = z.object({
     cpf: z.string()
 })
 
-export const loginCliente = async (request: Request, response: Response) =>{
+export const loginCliente = async (request: Request, response: Response) => {
     const cliente = clienteSchema.safeParse(request.body);
 
-    if(!cliente.success){
+    if (!cliente.success) {
         return response.json({
             mensagem: "Dados inválidos"
         })
     }
 
-    const {code, cpf} = cliente.data
+    const { code, cpf } = cliente.data
 
     const resposta = await loginClienteToken(code, cpf);
 
-    if(!resposta){
+    if (!resposta) {
         return response.status(400).json({
             mensagem: "Cliente não encontrado"
         })

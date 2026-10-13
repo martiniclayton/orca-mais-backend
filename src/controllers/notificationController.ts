@@ -22,9 +22,9 @@ export const getAllNotification = async (request: Request, response: Response) =
 }
 
 export const getNotificationUser = async (request: Request, response: Response) =>{
-    const cod = String(request.params.cod)
+    const clienteId = Number(request.usuario?.id);
 
-    const resposta = await getNotificationUserService(cod)
+    const resposta = await getNotificationUserService(clienteId)
 
     if(resposta.length === 0) {
         return response.json({
@@ -33,7 +33,6 @@ export const getNotificationUser = async (request: Request, response: Response) 
     }
 
     return response.json({
-        cod: cod,
-        ordens: resposta
+        notificacoes: resposta
     })
 }

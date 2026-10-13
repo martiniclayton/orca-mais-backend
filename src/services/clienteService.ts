@@ -1,6 +1,10 @@
 import { clientes, NovoCliente } from "../data/clientes.js"
+import { AppDataSource } from "../DataSource.js";
+import { Ordens } from "../entitys/ordens.js";
 import { Cliente } from "../types/TypeCliente.js";
 import { clientesBanco } from "./ordemService.js";
+
+const ordensBanco = AppDataSource.getRepository(Ordens);
 
 
 export const gerarCodigoAleatorio = (): string => {
@@ -14,6 +18,40 @@ export const gerarCodigoAleatorio = (): string => {
     
     return codigo;
 };
+
+export const getClienteService =  async(codigo: number) =>{
+    const cliente =  await clientesBanco.findOne({
+        where: {
+            id: codigo
+        },
+        select:{
+            codAcesso: true,
+            id: false,
+            nome: true,
+            telefone: true
+        }
+    })
+
+    if(!cliente){
+        return null
+    }
+
+    return cliente
+}
+
+export const getOrdersUserUserService = (clienteId: number) =>{
+    const ordens = ordensBanco.find({
+        where: {
+            clienteId: clienteId
+        }
+    })
+
+    if(!ordens){
+        return null
+    }
+
+    return ordens
+}
 
 export const BuscarCliente = async (cpf: string)=>{
     // const user =  await clientesBanco.findOneBy({cpf});

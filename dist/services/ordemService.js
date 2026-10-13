@@ -9,8 +9,11 @@ import { enviarEmailCodigoAcesso } from "./emailService.js";
 const ordensBanco = AppDataSource.getRepository(Ordens);
 export const clientesBanco = AppDataSource.getRepository(Cliente);
 const notificationDate = AppDataSource.getRepository(NotificacaoEntity);
-export const pegarTodasOrderns = async () => {
+export const pegarTodasOrderns = async (prestadorId) => {
     const ordens = await ordensBanco.find({
+        where: {
+            prestadorId: prestadorId
+        },
         relations: {
             cliente: true,
             notificacao: true
@@ -31,12 +34,27 @@ export const filtrarOrdensFinalizadas = async (status) => {
         ordens = await ordensBanco.find({
             where: {
                 status: In(["Em andamento", "Pronto para retirada"])
+            },
+            select: {
+                cliente: {
+                    codAcesso: false,
+                    id: false,
+                    nome: true,
+                    telefone: false
+                },
+                clienteId: false,
+                dataCriacao: true,
+                descricao: true,
+                id: false,
+                placa: true,
+                status: true,
+                tipoServico: true
             }
         });
     }
     return ordens;
 };
-export const adcOrdem = async (ordem) => {
+export const adcOrdem = async (ordem, prestadorId) => {
     let cliente;
     const usuarioBuscado = await BuscarCliente(ordem.cpf);
     if (!usuarioBuscado) {
@@ -55,6 +73,7 @@ export const adcOrdem = async (ordem) => {
         // nome: cliente.nome,
         // cpf: cliente.cpf,
         // telefone: cliente.telefone,
+        prestadorId: prestadorId,
         clienteId: cliente.id,
         placa: ordem.placa,
         dataCriacao: new Date(),

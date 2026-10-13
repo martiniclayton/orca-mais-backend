@@ -78,7 +78,7 @@ export const loginService = async (email: string, senha: string) => {
             email
         },
         select:{
-            id: false,
+            id: true,
             nome: true,
             email: true,
             cpf: false,

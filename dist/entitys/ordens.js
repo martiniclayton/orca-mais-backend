@@ -10,9 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cliente } from "./clientes.js";
 import { NotificacaoEntity } from "./notification.js";
+import { EntityPrestador } from "./Prestador.js";
 let Ordens = class Ordens {
     id;
     clienteId;
+    prestadorId;
+    prestador;
     cliente;
     notificacao;
     placa;
@@ -29,6 +32,14 @@ __decorate([
     Column({ type: "varchar" }),
     __metadata("design:type", Number)
 ], Ordens.prototype, "clienteId", void 0);
+__decorate([
+    Column({ type: "int" }),
+    __metadata("design:type", Number)
+], Ordens.prototype, "prestadorId", void 0);
+__decorate([
+    ManyToOne(() => EntityPrestador, { nullable: false }),
+    __metadata("design:type", EntityPrestador)
+], Ordens.prototype, "prestador", void 0);
 __decorate([
     ManyToOne(() => Cliente, { eager: true }),
     JoinColumn({ name: "clienteId" }),

@@ -7,6 +7,7 @@ import routeOrdem from './routes/ordensRoutes.js';
 import { AppDataSource } from './DataSource.js';
 import cors from 'cors';
 import { notificacaoRoutes } from './routes/notificacoesRoutes.js';
+import { rotasCliente } from "./routes/clienteRoutes.js";
 
 const server = express()
 server.use(express.json());
@@ -15,6 +16,7 @@ server.use(cors())
 server.use(route)
 server.use(routeOrdem)
 server.use(notificacaoRoutes)
+server.use(rotasCliente)
 
 AppDataSource.initialize()
     .then(() => {

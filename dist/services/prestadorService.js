@@ -54,7 +54,7 @@ export const loginService = async (email, senha) => {
             email
         },
         select: {
-            id: false,
+            id: true,
             nome: true,
             email: true,
             cpf: false,

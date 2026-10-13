@@ -15,9 +15,12 @@ export const clientesBanco = AppDataSource.getRepository(Cliente);
 const notificationDate = AppDataSource.getRepository(NotificacaoEntity)
 
 
-export const pegarTodasOrderns = async () => {
+export const pegarTodasOrderns = async (prestadorId: number) => {
 
     const ordens = await ordensBanco.find({
+        where: {
+            prestadorId: prestadorId
+        },
             relations: {
                 cliente: true,
                 notificacao: true 
@@ -41,6 +44,21 @@ export const filtrarOrdensFinalizadas = async (status: string) => {
         ordens = await ordensBanco.find({
             where: {
                 status: In(["Em andamento", "Pronto para retirada"])
+            },
+            select: {
+                cliente: {
+                    codAcesso: false,
+                    id: false,
+                    nome: true,
+                    telefone: false
+                },
+                clienteId: false,
+                dataCriacao: true,
+                descricao: true,
+                id: false,
+                placa: true,
+                status: true,
+                tipoServico: true
             }
         })
     }
@@ -48,7 +66,7 @@ export const filtrarOrdensFinalizadas = async (status: string) => {
     return ordens
 }
 
-export const adcOrdem = async (ordem: TypeOrdemRequest) => {
+export const adcOrdem = async (ordem: TypeOrdemRequest, prestadorId: number) => {
     let cliente;
     const usuarioBuscado = await BuscarCliente(ordem.cpf);
 
@@ -69,6 +87,7 @@ export const adcOrdem = async (ordem: TypeOrdemRequest) => {
         // nome: cliente.nome,
         // cpf: cliente.cpf,
         // telefone: cliente.telefone,
+        prestadorId: prestadorId,
         clienteId: cliente!.id,
         placa: ordem.placa,
         dataCriacao: new Date(),

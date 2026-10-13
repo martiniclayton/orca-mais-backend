@@ -4,10 +4,10 @@ import { authToken } from "../midlleware/autenticarToken.js";
 
 const routeOrdem = Router()
 
-routeOrdem.get('/ordem/acesso/:cod',authToken, getOrdersUser)
+routeOrdem.get('/ordem/acesso/:cod',authToken("cliente"), getOrdersUser)
 routeOrdem.post('/ordem/acesso', loginCliente)
-routeOrdem.get('/ordem', getAllorders);
-routeOrdem.post('/ordem', pushOrder);
+routeOrdem.get('/ordem', authToken("prestador"), getAllorders);
+routeOrdem.post('/ordem', authToken("prestador"), pushOrder);
 routeOrdem.patch('/ordem/:id', attOrder)
 routeOrdem.delete('/ordem/:id', deleteOrder)
 

@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Cliente } from "./clientes.js";
 import { NotificacaoEntity } from "./notification.js";
+import { EntityPrestador } from "./Prestador.js";
 
 @Entity("Ordens")
 export class Ordens {
@@ -9,6 +10,12 @@ export class Ordens {
 
     @Column({type: "varchar"})
     clienteId!: number
+
+    @Column({type: "int"})
+    prestadorId: number;
+
+    @ManyToOne(() => EntityPrestador, {nullable: false})
+    prestador!: EntityPrestador
 
     @ManyToOne(()=> Cliente, { eager: true})
     @JoinColumn({name: "clienteId"})
