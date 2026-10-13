@@ -1,3 +1,4 @@
+import { gerarTokenCliente } from "../auth/gerarToken.js";
 import { AppDataSource } from "../DataSource.js";
 import { Ordens } from "../entitys/ordens.js";
 import { clientesBanco } from "./ordemService.js";
@@ -10,6 +11,19 @@ export const gerarCodigoAleatorio = () => {
         codigo += caracteres.charAt(indiceAleatorio);
     }
     return codigo;
+};
+export const loginClienteService = async (code, cpf) => {
+    const cliente = await clientesBanco.findOne({
+        where: {
+            codAcesso: code,
+            cpf: cpf
+        }
+    });
+    if (!cliente) {
+        return null;
+    }
+    const token = gerarTokenCliente(cliente);
+    return token;
 };
 export const getClienteService = async (codigo) => {
     const cliente = await clientesBanco.findOne({

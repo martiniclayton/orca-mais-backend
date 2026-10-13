@@ -1,9 +1,8 @@
-import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, getOrderUser, loginClienteToken, pegarTodasOrderns } from "../services/ordemService.js";
+import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, pegarTodasOrderns } from "../services/ordemService.js";
 import { z } from "zod";
 export const getAllorders = async (request, response) => {
     const { ativas, status } = request.query;
     const prestadorId = Number(request.usuario?.id);
-    console.log(prestadorId);
     const statusValue = typeof status === "string" ? status : undefined;
     if (statusValue) {
         const resposta = await filtrarOrdensFinalizadas(statusValue, prestadorId);
@@ -59,7 +58,8 @@ export const pushOrder = async (request, response) => {
 };
 export const attOrder = async (request, response) => {
     const id = Number(request.params.id);
-    const ordemAtualizada = await attStatus(id);
+    const prestadorId = Number(request.usuario?.id);
+    const ordemAtualizada = await attStatus(id, prestadorId);
     if (ordemAtualizada) {
         return response.json({
             mensagem: "Status atualizado",
@@ -74,7 +74,8 @@ export const attOrder = async (request, response) => {
 };
 export const deleteOrder = async (request, response) => {
     const id = Number(request.params.id);
-    const resposta = await excluirOrdem(id);
+    const prestadorId = Number(request.usuario?.id);
+    const resposta = await excluirOrdem(id, prestadorId);
     if (resposta) {
         response.json({
             mensagem: "Ordem excluida com sucesso"
@@ -82,51 +83,50 @@ export const deleteOrder = async (request, response) => {
     }
     else {
         response.json({
-            mensagem: "A ordem não existe"
+            mensagem: "A ordem não encontrada"
         });
     }
 };
-export const getOrdersUser = async (request, response) => {
-    const codigo = String(request.params.cod);
-    if (!codigo) {
-        return response.status(400).json({
-            mensagem: "Código do cliente não informado"
-        });
-    }
-    const resultado = await getOrderUser(codigo);
-    if (resultado) {
-        const { cliente, ordens } = resultado;
-        return response.json({
-            cliente,
-            ordens
-        });
-    }
-    else {
-        return response.json({
-            mensagem: "ordens não encontradas"
-        });
-    }
-};
-const clienteSchema = z.object({
-    code: z.string(),
-    cpf: z.string()
-});
-export const loginCliente = async (request, response) => {
-    const cliente = clienteSchema.safeParse(request.body);
-    if (!cliente.success) {
-        return response.json({
-            mensagem: "Dados inválidos"
-        });
-    }
-    const { code, cpf } = cliente.data;
-    const resposta = await loginClienteToken(code, cpf);
-    if (!resposta) {
-        return response.status(400).json({
-            mensagem: "Cliente não encontrado"
-        });
-    }
-    return response.json({
-        token: resposta
-    });
-};
+// export const getOrdersUser = async (request: Request, response: Response) => {
+//     const codigo = String(request.params.cod);
+//     if (!codigo) {
+//         return response.status(400).json({
+//             mensagem: "Código do cliente não informado"
+//         })
+//     }
+//     const resultado = await getOrderUser(codigo);
+//     if (resultado) {
+//         const { cliente, ordens } = resultado
+//         return response.json({
+//             cliente,
+//             ordens
+//         })
+//     } else {
+//         return response.json({
+//             mensagem: "ordens não encontradas"
+//         })
+//     }
+// }
+// const clienteSchema = z.object({
+//     code: z.string(),
+//     cpf: z.string()
+// })
+// export const loginCliente = async (request: Request, response: Response) => {
+//     const cliente = clienteSchema.safeParse(request.body);
+//     if (!cliente.success) {
+//         return response.json({
+//             mensagem: "Dados inválidos"
+//         })
+//     }
+//     const { code, cpf } = cliente.data
+//     const resposta = await loginClienteToken(code, cpf);
+//     if (!resposta) {
+//         return response.status(400).json({
+//             mensagem: "Cliente não encontrado"
+//         })
+//     }
+//     return response.json({
+//         token: resposta
+//     })
+// }
 //# sourceMappingURL=ordermController.js.map

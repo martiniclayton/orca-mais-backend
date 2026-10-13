@@ -8,7 +8,6 @@ export const getAllorders = async (request: Request, response: Response) => {
     const { ativas, status } = request.query;
     const prestadorId = Number(request.usuario?.id);
 
-    console.log(prestadorId);
 
     const statusValue = typeof status === "string" ? status : undefined
 
@@ -73,8 +72,9 @@ export const pushOrder = async (request: Request, response: Response) => {
 
 export const attOrder = async (request: Request, response: Response) => {
     const id = Number(request.params.id);
+    const prestadorId = Number(request.usuario?.id);
 
-    const ordemAtualizada = await attStatus(id)
+    const ordemAtualizada = await attStatus(id, prestadorId)
 
     if (ordemAtualizada) {
         return response.json({
@@ -91,8 +91,9 @@ export const attOrder = async (request: Request, response: Response) => {
 
 export const deleteOrder = async (request: Request, response: Response) => {
     const id = Number(request.params.id);
+    const prestadorId = Number(request.usuario?.id);
 
-    const resposta = await excluirOrdem(id)
+    const resposta = await excluirOrdem(id, prestadorId);
 
     if (resposta) {
         response.json({
@@ -100,63 +101,62 @@ export const deleteOrder = async (request: Request, response: Response) => {
         })
     } else {
         response.json({
-            mensagem: "A ordem não existe"
-        })
-    }
-
-}
-
-export const getOrdersUser = async (request: Request, response: Response) => {
-    const codigo = String(request.params.cod);
-
-    if (!codigo) {
-        return response.status(400).json({
-            mensagem: "Código do cliente não informado"
-        })
-    }
-
-    const resultado = await getOrderUser(codigo);
-
-    if (resultado) {
-        const { cliente, ordens } = resultado
-        return response.json({
-            cliente,
-            ordens
-        })
-    } else {
-        return response.json({
-            mensagem: "ordens não encontradas"
+            mensagem: "A ordem não encontrada"
         })
     }
 }
 
-const clienteSchema = z.object({
-    code: z.string(),
-    cpf: z.string()
-})
+// export const getOrdersUser = async (request: Request, response: Response) => {
+//     const codigo = String(request.params.cod);
 
-export const loginCliente = async (request: Request, response: Response) => {
-    const cliente = clienteSchema.safeParse(request.body);
+//     if (!codigo) {
+//         return response.status(400).json({
+//             mensagem: "Código do cliente não informado"
+//         })
+//     }
 
-    if (!cliente.success) {
-        return response.json({
-            mensagem: "Dados inválidos"
-        })
-    }
+//     const resultado = await getOrderUser(codigo);
 
-    const { code, cpf } = cliente.data
+//     if (resultado) {
+//         const { cliente, ordens } = resultado
+//         return response.json({
+//             cliente,
+//             ordens
+//         })
+//     } else {
+//         return response.json({
+//             mensagem: "ordens não encontradas"
+//         })
+//     }
+// }
 
-    const resposta = await loginClienteToken(code, cpf);
+// const clienteSchema = z.object({
+//     code: z.string(),
+//     cpf: z.string()
+// })
 
-    if (!resposta) {
-        return response.status(400).json({
-            mensagem: "Cliente não encontrado"
-        })
-    }
+// export const loginCliente = async (request: Request, response: Response) => {
+//     const cliente = clienteSchema.safeParse(request.body);
 
-    return response.json({
-        token: resposta
-    })
+//     if (!cliente.success) {
+//         return response.json({
+//             mensagem: "Dados inválidos"
+//         })
+//     }
+
+//     const { code, cpf } = cliente.data
+
+//     const resposta = await loginClienteToken(code, cpf);
+
+//     if (!resposta) {
+//         return response.status(400).json({
+//             mensagem: "Cliente não encontrado"
+//         })
+//     }
+
+//     return response.json({
+//         token: resposta
+//     })
 
 
-}
+// }

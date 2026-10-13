@@ -47,7 +47,7 @@ export const filtrarOrdensFinalizadas = async (status, prestadorId) => {
                 clienteId: false,
                 dataCriacao: true,
                 descricao: true,
-                id: false,
+                id: true,
                 placa: true,
                 status: true,
                 tipoServico: true
@@ -95,8 +95,13 @@ export const adcOrdem = async (ordem, prestadorId) => {
     enviarEmailCodigoAcesso("teste@gmail.com", cliente?.nome, cliente?.codAcesso);
     return ordemSalva;
 };
-export const attStatus = async (id) => {
-    const ordem = await ordensBanco.findOneBy({ id });
+export const attStatus = async (id, prestadorId) => {
+    const ordem = await ordensBanco.findOne({
+        where: {
+            id: id,
+            prestadorId: prestadorId
+        }
+    });
     if (!ordem) {
         return null;
     }
@@ -113,8 +118,13 @@ export const attStatus = async (id) => {
     await notificationDate.insert(criarNotificacao);
     return ordem;
 };
-export const excluirOrdem = async (id) => {
-    const ordem = await ordensBanco.findOneBy({ id });
+export const excluirOrdem = async (id, prestadorId) => {
+    const ordem = await ordensBanco.findOne({
+        where: {
+            id: id,
+            prestadorId: prestadorId
+        }
+    });
     if (!ordem) {
         return null;
     }

@@ -16,6 +16,7 @@ export const authToken = (tipoPermitido) => {
         }
         try {
             const payload = jwt.verify(token, SECRETKEY);
+            console.log(payload);
             if (typeof payload === "string" || payload.tipo !== tipoPermitido) {
                 return response.status(403).json({
                     mensagem: "Você não tem permissão para acessar este recurso"

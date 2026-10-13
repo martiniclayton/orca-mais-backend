@@ -57,7 +57,7 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
                 clienteId: false,
                 dataCriacao: true,
                 descricao: true,
-                id: false,
+                id: true,
                 placa: true,
                 status: true,
                 tipoServico: true
@@ -115,9 +115,14 @@ export const adcOrdem = async (ordem: TypeOrdemRequest, prestadorId: number) => 
     return ordemSalva
 }
 
-export const attStatus = async (id: number) => {
+export const attStatus = async (id: number, prestadorId: number) => {
 
-    const ordem = await ordensBanco.findOneBy({ id });
+    const ordem = await ordensBanco.findOne({
+        where: {
+            id: id,
+            prestadorId: prestadorId
+        }
+     });
 
     if (!ordem) {
         return null
@@ -141,8 +146,13 @@ export const attStatus = async (id: number) => {
     return ordem
 }
 
-export const excluirOrdem = async (id: number) => {
-    const ordem = await ordensBanco.findOneBy({ id });
+export const excluirOrdem = async (id: number, prestadorId: number) => {
+    const ordem = await ordensBanco.findOne({ 
+        where: {
+            id: id,
+            prestadorId: prestadorId
+        }
+     });
 
     if (!ordem) {
         return null
