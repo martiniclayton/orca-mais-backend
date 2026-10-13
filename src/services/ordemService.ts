@@ -30,14 +30,15 @@ export const pegarTodasOrderns = async (prestadorId: number) => {
     return ordens
 }
 
-export const filtrarOrdensFinalizadas = async (status: string) => {
+export const filtrarOrdensFinalizadas = async (status: string, prestadorId: number) => {
 
     let ordens;
 
     if (status === "Finalizado") {
         ordens = await ordensBanco.find({
             where: {
-                status: status
+                status: status,
+                prestadorId: prestadorId
             }
         })
     } else {

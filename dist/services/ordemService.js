@@ -21,12 +21,13 @@ export const pegarTodasOrderns = async (prestadorId) => {
     });
     return ordens;
 };
-export const filtrarOrdensFinalizadas = async (status) => {
+export const filtrarOrdensFinalizadas = async (status, prestadorId) => {
     let ordens;
     if (status === "Finalizado") {
         ordens = await ordensBanco.find({
             where: {
-                status: status
+                status: status,
+                prestadorId: prestadorId
             }
         });
     }

@@ -6,7 +6,7 @@ export const getAllorders = async (request, response) => {
     console.log(prestadorId);
     const statusValue = typeof status === "string" ? status : undefined;
     if (statusValue) {
-        const resposta = await filtrarOrdensFinalizadas(statusValue);
+        const resposta = await filtrarOrdensFinalizadas(statusValue, prestadorId);
         return response.json({
             mensagem: "Ordens Finalizadas",
             ordens: resposta
