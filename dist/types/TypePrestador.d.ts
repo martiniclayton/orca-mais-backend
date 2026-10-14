@@ -7,4 +7,5 @@ export interface Prestador {
     senha: string;
 }
 export type NovoPrestador = Omit<Prestador, "id">;
+export type TypeAtualizarPrestador = Omit<Prestador, "nome" | "cpf">;
 //# sourceMappingURL=TypePrestador.d.ts.map

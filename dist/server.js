@@ -13,6 +13,17 @@ server.use(route);
 server.use(routeOrdem);
 server.use(notificacaoRoutes);
 server.use(rotasCliente);
+server.get('/', (request, response) => {
+    response.json({
+        mensagem: "API orça mais funcionando"
+    });
+});
+server.use((err, req, res, next) => {
+    console.error(err);
+    return res.status(500).json({
+        mensagem: "Erro interno do servidor"
+    });
+});
 const PORT = process.env.PORT || 3000;
 const iniciarServidor = async () => {
     try {
@@ -25,14 +36,8 @@ const iniciarServidor = async () => {
     }
     catch (err) {
         console.log("Erro ao iniciar a aplicação", err);
-        process.exit;
+        process.exit(1);
     }
 };
 iniciarServidor();
-const prestadores = [];
-server.get('/', (request, response) => {
-    response.json({
-        mensagem: "API orça mais funcionando"
-    });
-});
 //# sourceMappingURL=server.js.map

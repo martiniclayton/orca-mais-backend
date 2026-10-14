@@ -8,10 +8,10 @@ export class Ordens {
     @PrimaryGeneratedColumn()
     id!: number
 
-    @Column({type: "varchar"})
+    @Column({type: "varchar", select: false})
     clienteId!: number
 
-    @Column({type: "int"})
+    @Column({type: "int", select: false})
     prestadorId: number;
 
     @ManyToOne(() => EntityPrestador, {nullable: false})

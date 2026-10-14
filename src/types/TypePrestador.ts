@@ -8,3 +8,5 @@ export interface Prestador {
 }
 
 export type NovoPrestador = Omit<Prestador, "id">;
+
+export type TypeAtualizarPrestador = Omit<Prestador, "nome" | "cpf">;

@@ -1,7 +1,6 @@
 import "dotenv/config";
 
-import express, { Request, Response } from 'express';
-import { Prestador } from './types/TypePrestador.js';
+import express, { NextFunction, Request, Response } from 'express';
 import route from './routes/prestadorRoutes.js';
 import routeOrdem from './routes/ordensRoutes.js';
 import { AppDataSource } from './DataSource.js';
@@ -17,6 +16,19 @@ server.use(route)
 server.use(routeOrdem)
 server.use(notificacaoRoutes)
 server.use(rotasCliente)
+server.get('/', (request: Request, response: Response) => {
+    response.json({
+        mensagem: "API orça mais funcionando"
+    })
+});
+
+server.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+
+    return res.status(500).json({
+        mensagem: "Erro interno do servidor"
+    })
+})
 
 const PORT = process.env.PORT || 3000;
 
@@ -34,20 +46,12 @@ const iniciarServidor = async () => {
         })
     } catch(err){
         console.log("Erro ao iniciar a aplicação", err);
-        process.exit
+        process.exit(1);
 
     }
 }
 
 iniciarServidor();
 
-const prestadores: Prestador[] = []
 
-
-
-server.get('/', (request: Request, response: Response) => {
-    response.json({
-        mensagem: "API orça mais funcionando"
-    })
-});
 

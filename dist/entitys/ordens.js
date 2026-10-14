@@ -29,11 +29,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Ordens.prototype, "id", void 0);
 __decorate([
-    Column({ type: "varchar" }),
+    Column({ type: "varchar", select: false }),
     __metadata("design:type", Number)
 ], Ordens.prototype, "clienteId", void 0);
 __decorate([
-    Column({ type: "int" }),
+    Column({ type: "int", select: false }),
     __metadata("design:type", Number)
 ], Ordens.prototype, "prestadorId", void 0);
 __decorate([

@@ -1,26 +1,32 @@
 import { atuaizarPrestador, buscarPrestador, criarPrestador, deletarPrestador, loginService, pegarTodosPrestadores } from "../services/prestadorService.js"
 import type { Request, Response } from "express";
-import { z } from 'zod';
+import { email, z } from 'zod';
 import { gerarToken } from "../auth/gerarToken.js";
 
 
-export const buscarPrestadorPorIdController = async (request: Request, response: Response) => {
+// export const buscarPrestadorPorIdController = async (request: Request, response: Response) => {
 
-    const id = Number(request.params.id)
+//     const id = Number(request.params.id);
 
-    const resposta = await buscarPrestador(id)
+//     if(!Number.isInteger(id) || id <=0){
+//         return response.status(400).json({
+//             mensagem: "Número de ID inválido"
+//         })
+//     }
 
-    if (!resposta) {
-        return response.json({
-            mensagem: "Usuário não encontrado"
-        })
-    }
+//     const resposta = await buscarPrestador(id)
 
-    return response.json({
-        mensagem: "Usuário encontrado",
-        prestador: resposta
-    })
-}
+//     if (!resposta) {
+//         return response.json({
+//             mensagem: "Usuário não encontrado"
+//         })
+//     }
+
+//     return response.json({
+//         mensagem: "Usuário encontrado",
+//         prestador: resposta
+//     })
+// }
 
 const prestadorSchema = z.object({
     nome: z.string().trim().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -39,16 +45,16 @@ const prestadorSchema = z.object({
 })
 
 export const criarPrestadorController = async (request: Request, response: Response) => {
-    const user = prestadorSchema.safeParse(request.body);
+    const prestador = prestadorSchema.safeParse(request.body);
 
-    if(!user.success){
+    if(!prestador.success){
         return response.status(400).json({
             mensagem: "Campos inválidos",
-            erro: user.error.format()
+            erro: prestador.error.format()
         });
     }
 
-    const resposta = await criarPrestador(user.data);
+    const resposta = await criarPrestador(prestador.data);
 
     if(!resposta){
         return response.status(409).json({
@@ -61,30 +67,56 @@ export const criarPrestadorController = async (request: Request, response: Respo
     })
 }
 
-export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
-    const prestadores = await pegarTodosPrestadores();
+// export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
+//     const prestadores = await pegarTodosPrestadores();
 
-    if(prestadores.length === 0){
-        return response.status(200).json({
-            mensagem: "Não existe nenhum prestador cadastrado"
+//     if(prestadores.length === 0){
+//         return response.status(200).json({
+//             mensagem: "Não existe nenhum prestador cadastrado"
+//         })
+//     }
+
+//     return response.json({
+//         prestadores
+//     })
+// }
+
+const atualizarPrestadorSchema = z.object({
+    email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
+    telefone: z.string().transform(valor => valor.replace(/\D/g, ""))
+        .pipe(
+            z.string().regex(
+                /^\d{10,11}$/,
+                "Telefone deve conter 10 ou 11 dígitos"
+            )
+        ),
+    estabelecimento: z.string().trim()
+        .min(2, "Informe o nome do estabelecimento"),
+    senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
+})
+
+export const atualizarPrestadorController = async (request: Request, response: Response) => {
+    const id = Number(request.usuario?.id);
+    const prestador = atualizarPrestadorSchema.safeParse(request.body);
+
+    if(!Number.isInteger(id) || id <= 0){
+        return response.status(400).json({
+            mensagem: "Número de ID inválido"
         })
     }
 
-    return response.json({
-        prestadores
-    })
-}
+    if(!prestador.success){
+        return response.status(400).json({
+            mensagem: "Dados do prestador inválidos"
+        })
+    }
 
-export const atualizarPrestadorController = async (request: Request, response: Response) => {
-    const id = Number(request.params.id);
-    const user = request.body;
-
-    const resposta = await atuaizarPrestador(id, user)
+    const resposta = await atuaizarPrestador(id, prestador.data)
 
     if (resposta) {
         return response.status(200).json({
             mensagem: "Prestador atualizado",
-            prestador: user
+            prestador: prestador
         })
     } else {
         return response.status(404).json({
@@ -94,7 +126,13 @@ export const atualizarPrestadorController = async (request: Request, response: R
 }
 
 export const deletarPrestadorController =  async (request: Request, response: Response) => {
-    const id = Number(request.params.id);
+    const id = Number(request.usuario?.id);
+
+    if(!Number.isInteger(id) || id <=0){
+        return response.status(400).json({
+            mensagem: "Número de ID inválido"
+        })
+    }
 
     const resposta = await deletarPrestador(id)
 
@@ -109,8 +147,21 @@ export const deletarPrestadorController =  async (request: Request, response: Re
     }
 }
 
+const loginSchema = z.object ({
+    email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
+    senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
+})
+
 export const loginControler = async (request: Request, response: Response) =>{
-    const { email, senha } = request.body
+    const userLogin = loginSchema.safeParse(request.body)
+
+    if(!userLogin.success){
+        return response.status(400).json({
+            mensagem: "Dados do prestador inválidos"
+        })
+    }
+
+    const { email, senha } = userLogin.data
 
     const resposta = await loginService(email, senha);
     
@@ -119,8 +170,6 @@ export const loginControler = async (request: Request, response: Response) =>{
             mensagem: "E-mail ou senha inválidos"
         })
     }
-
-    // const { user, token } = resposta
 
     return response.json({
         resposta

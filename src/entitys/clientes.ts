@@ -14,6 +14,6 @@ export class Cliente {
     @Column({type: "varchar", select: true})
     telefone!: string
 
-    @Column({type: "varchar", select: true})
+    @Column({type: "varchar", select: false})
     codAcesso!: string
 }

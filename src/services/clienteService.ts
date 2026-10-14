@@ -1,11 +1,12 @@
 import { gerarTokenCliente } from "../auth/gerarToken.js";
-import { clientes, NovoCliente } from "../data/clientes.js"
+import { NovoCliente } from "../data/clientes.js"
 import { AppDataSource } from "../DataSource.js";
+import { Cliente } from "../entitys/clientes.js";
 import { Ordens } from "../entitys/ordens.js";
-import { Cliente } from "../types/TypeCliente.js";
-import { clientesBanco } from "./ordemService.js";
+import {TypeCliente } from "../types/TypeCliente.js";
 
 const ordensBanco = AppDataSource.getRepository(Ordens);
+const clientesBanco = AppDataSource.getRepository(Cliente);
 
 
 export const gerarCodigoAleatorio = (): string => {
@@ -91,7 +92,7 @@ export const BuscarCliente = async (cpf: string)=>{
 }
 
 export const CriarCliente =  async({ nome, cpf, telefone }: NovoCliente) =>{
-    const user: Cliente = {
+    const user: TypeCliente = {
         nome: nome,
         cpf: cpf,
         telefone: telefone,

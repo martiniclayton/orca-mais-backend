@@ -11,7 +11,7 @@ export const loginClienteController = async (request: Request, response: Respons
     const clienteDados = clienteSchema.safeParse(request.body);
 
     if(!clienteDados.success){
-        return response.json({
+        return response.status(400).json({
             mensagem: "Dados inválidos"
         })
     }
@@ -21,7 +21,7 @@ export const loginClienteController = async (request: Request, response: Respons
     const resposta = await loginClienteService(code, cpf);
 
     if(!resposta){
-        return response.json({
+        return response.status(404).json({
             mensagem: "Cliente não encontrado"
         })
     }
@@ -29,24 +29,26 @@ export const loginClienteController = async (request: Request, response: Respons
     return response.status(200).json({
         token: resposta
     })
-
-
-
 }
 
 export const getCliente = async (request: Request, response: Response) =>{
-    const codigo = String(request.params.cod)
     const clienteId = Number(request.usuario?.id)
+
+    if(!Number.isInteger(clienteId) || clienteId <= 0){
+        return response.status(400).json({
+            mensagem: "ID inválido"
+        })
+    }
 
     const resposta = await getClienteService(clienteId);
 
     if(!resposta){
-        return response.json({
+        return response.status(404).json({
             mensagem: "Cliente não encontrado"
         })
     }
 
-    return response.json({
+    return response.status(200).json({
         mensagem: "Cliente encontrado com sucesso",
         cliente: resposta
     })
@@ -55,15 +57,21 @@ export const getCliente = async (request: Request, response: Response) =>{
 export const getOrdersUserUser = async (request: Request, response: Response) =>{
     const clienteId = Number(request.usuario?.id);
 
+    if(!Number.isInteger(clienteId) || clienteId <=0){
+        return response.status(400).json({
+            mensagem: "ID inválido"
+        })
+    }
+
     const resposta = await getOrdersUserUserService(clienteId)
 
     if(!resposta){
-        return response.json({
+        return response.status(404).json({
             mensagem: "Ordens não encontradas"
         })
     }
     
-    return response.json({
+    return response.status(200).json({
         mensagem: "Ordens Cliente",
         cliente: resposta[0]?.cliente,
         ordens: resposta

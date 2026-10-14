@@ -1,6 +1,6 @@
-import { Cliente } from "../types/TypeCliente.js";
+import { TypeCliente } from "../types/TypeCliente.js";
 
-export const clientes: Cliente[] = [
+export const clientes: TypeCliente[] = [
 
     {
         nome: "Clayton Timoteo",
@@ -32,4 +32,4 @@ export const clientes: Cliente[] = [
 
 ];
 
-export type NovoCliente = Omit<Cliente, "id" | "codAcesso">;
+export type NovoCliente = Omit<TypeCliente, "id" | "codAcesso">;

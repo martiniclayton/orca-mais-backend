@@ -1,7 +1,7 @@
 import { gerarToken } from "../auth/gerarToken.js";
 import { AppDataSource } from "../DataSource.js";
 import { EntityPrestador } from "../entitys/Prestador.js";
-import { NovoPrestador, Prestador } from "../types/TypePrestador.js";
+import { NovoPrestador, Prestador, TypeAtualizarPrestador } from "../types/TypePrestador.js";
 import bcrypt from "bcryptjs";
 
 const prestadores = AppDataSource.getRepository(EntityPrestador)
@@ -43,7 +43,7 @@ export const pegarTodosPrestadores = async () => {
     return await prestadores.find()
 }
 
-export const atuaizarPrestador = async (id: number, novosDados: NovoPrestador) => {
+export const atuaizarPrestador = async (id: number, novosDados: TypeAtualizarPrestador) => {
 
     const prestador = await prestadores.findOneBy({ id });
 
@@ -51,10 +51,10 @@ export const atuaizarPrestador = async (id: number, novosDados: NovoPrestador) =
         return null
     };
 
-    prestador.nome = novosDados.nome
-    prestador.cpf = novosDados.cpf
     prestador.email = novosDados.email
     prestador.telefone = novosDados.telefone
+    prestador.estabelecimento = novosDados.estabelecimento
+    prestador.senha = novosDados.senha
 
     return await prestadores.save(prestador)
 
@@ -109,7 +109,7 @@ export const loginService = async (email: string, senha: string) => {
         prestador: {
             id: prestador.id,
             nome: prestador.nome,
-            enail: prestador.email,
+            email: prestador.email,
             estabelecimento: prestador.estabelecimento
         },
         token: token

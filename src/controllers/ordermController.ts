@@ -1,19 +1,33 @@
-import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, getOrderUser, loginClienteToken, pegarTodasOrderns } from "../services/ordemService.js"
+import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, pegarTodasOrderns } from "../services/ordemService.js"
 import { Request, Response } from "express";
-import { TypeOrdemRequest } from "../types/TypeOrdem.js";
 import { z } from "zod";
+
 
 export const getAllorders = async (request: Request, response: Response) => {
 
-    const { ativas, status } = request.query;
+    const { status } = request.query;
     const prestadorId = Number(request.usuario?.id);
 
+    if(!Number.isInteger(prestadorId) || prestadorId <= 0){
+        return response.status(401).json({
+            mensagem: "Prestador não identificado"
+        })
+    }
 
-    const statusValue = typeof status === "string" ? status : undefined
+    const statusValue = z.union([
+        z.literal("Finalizado"),
+        z.literal("Ativos")
+    ]).safeParse(status);
 
-    if (statusValue) {
-        const resposta = await filtrarOrdensFinalizadas(statusValue, prestadorId)
-        return response.json({
+    if (status !== undefined && !statusValue.success) {
+        return response.status(400).json({
+            mensagem: "Status inválido"
+        })
+    }
+
+    if (statusValue.success) {
+        const resposta = await filtrarOrdensFinalizadas(statusValue.data, prestadorId)
+        return response.status(200).json({
             mensagem: "Ordens Finalizadas",
             ordens: resposta
         })
@@ -23,12 +37,13 @@ export const getAllorders = async (request: Request, response: Response) => {
     const Ordens = await pegarTodasOrderns(prestadorId);
 
     if (Ordens.length === 0) {
-        return response.json({
-            mensagem: "Nenhuma ordem cadastrada"
+        return response.status(200).json({
+            mensagem: "Nenhuma ordem cadastrada",
+            ordens: Ordens
         })
     }
-    return response.json({
-        Ordens
+    return response.status(200).json({
+        ordens: Ordens
     })
 }
 const statusEnum = z.enum([
@@ -37,11 +52,11 @@ const statusEnum = z.enum([
     "Finalizado"
 ])
 const ordemSchema = z.object({
-    nome: z.string(),
-    cpf: z.string(),
-    telefone: z.string(),
-    placa: z.string(),
-    tipoServico: z.string(),
+    nome: z.string().trim().min(1),
+    cpf: z.string().trim().min(1),
+    telefone: z.string().trim().min(1),
+    placa: z.string().trim().min(1),
+    tipoServico: z.string().trim().min(1),
     status: statusEnum,
     descricao: z.string().optional()
 })
@@ -49,9 +64,14 @@ export const pushOrder = async (request: Request, response: Response) => {
     const ordem = ordemSchema.safeParse(request.body);
     const prestadorId = Number(request.usuario?.id);
 
+    if(!Number.isInteger(prestadorId) || prestadorId <=0){
+        return response.status(401).json({
+            mensagem: "Prestador não informado"
+        })
+    }
 
     if (!ordem.success) {
-        return response.json({
+        return response.status(400).json({
             mensagem: "Campos inválidos",
             erro: ordem.error.format()
         })
@@ -59,30 +79,42 @@ export const pushOrder = async (request: Request, response: Response) => {
 
     const resposta = await adcOrdem(ordem.data, prestadorId)
 
-    if (resposta) {
-        return response.json({
-            mensagem: "Ordem adicionada com sucesso",
-        })
-    } else {
-        return response.json({
-            mensagem: "campos inválidos"
+    if (!resposta) {
+        return response.status(500).json({
+            mensagem: "Não foi possivel cadastrar a ordem",
         })
     }
+
+    return response.status(201).json({
+        mensagem: "Ordem cadastrada com sucesso"
+    })
 }
 
 export const attOrder = async (request: Request, response: Response) => {
     const id = Number(request.params.id);
     const prestadorId = Number(request.usuario?.id);
 
+    if(!Number.isInteger(id) || id <= 0){
+        return response.status(400).json({
+            mensagem: "ID da ordem inválido"
+        })
+    }
+
+    if(!Number.isInteger(prestadorId) || prestadorId <=0){
+        return response.status(401).json({
+            mensagem: "Prestador não informado"
+        })
+    }
+
     const ordemAtualizada = await attStatus(id, prestadorId)
 
     if (ordemAtualizada) {
-        return response.json({
+        return response.status(200).json({
             mensagem: "Status atualizado",
             novoStatus: ordemAtualizada.status
         })
     } else {
-        return response.json({
+        return response.status(404).json({
             mensagem: "A ordem não existe"
         })
     }
@@ -93,70 +125,27 @@ export const deleteOrder = async (request: Request, response: Response) => {
     const id = Number(request.params.id);
     const prestadorId = Number(request.usuario?.id);
 
+    if(!Number.isInteger(id) || id <= 0){
+        return response.status(400).json({
+            mensagem: "ID da ordem inválido"
+        })
+    }
+
+    if(!Number.isInteger(prestadorId) || prestadorId <=0){
+        return response.status(401).json({
+            mensagem: "Prestador não informado"
+        })
+    }
+
     const resposta = await excluirOrdem(id, prestadorId);
 
     if (resposta) {
-        response.json({
+        response.status(200).json({
             mensagem: "Ordem excluida com sucesso"
         })
     } else {
-        response.json({
+        response.status(404).json({
             mensagem: "A ordem não encontrada"
         })
     }
 }
-
-// export const getOrdersUser = async (request: Request, response: Response) => {
-//     const codigo = String(request.params.cod);
-
-//     if (!codigo) {
-//         return response.status(400).json({
-//             mensagem: "Código do cliente não informado"
-//         })
-//     }
-
-//     const resultado = await getOrderUser(codigo);
-
-//     if (resultado) {
-//         const { cliente, ordens } = resultado
-//         return response.json({
-//             cliente,
-//             ordens
-//         })
-//     } else {
-//         return response.json({
-//             mensagem: "ordens não encontradas"
-//         })
-//     }
-// }
-
-// const clienteSchema = z.object({
-//     code: z.string(),
-//     cpf: z.string()
-// })
-
-// export const loginCliente = async (request: Request, response: Response) => {
-//     const cliente = clienteSchema.safeParse(request.body);
-
-//     if (!cliente.success) {
-//         return response.json({
-//             mensagem: "Dados inválidos"
-//         })
-//     }
-
-//     const { code, cpf } = cliente.data
-
-//     const resposta = await loginClienteToken(code, cpf);
-
-//     if (!resposta) {
-//         return response.status(400).json({
-//             mensagem: "Cliente não encontrado"
-//         })
-//     }
-
-//     return response.json({
-//         token: resposta
-//     })
-
-
-// }

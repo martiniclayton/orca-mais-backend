@@ -1,18 +1,23 @@
-import { atuaizarPrestador, buscarPrestador, criarPrestador, deletarPrestador, loginService, pegarTodosPrestadores } from "../services/prestadorService.js";
+import { atuaizarPrestador, criarPrestador, deletarPrestador, loginService } from "../services/prestadorService.js";
 import { z } from 'zod';
-export const buscarPrestadorPorIdController = async (request, response) => {
-    const id = Number(request.params.id);
-    const resposta = await buscarPrestador(id);
-    if (!resposta) {
-        return response.json({
-            mensagem: "Usuário não encontrado"
-        });
-    }
-    return response.json({
-        mensagem: "Usuário encontrado",
-        prestador: resposta
-    });
-};
+// export const buscarPrestadorPorIdController = async (request: Request, response: Response) => {
+//     const id = Number(request.params.id);
+//     if(!Number.isInteger(id) || id <=0){
+//         return response.status(400).json({
+//             mensagem: "Número de ID inválido"
+//         })
+//     }
+//     const resposta = await buscarPrestador(id)
+//     if (!resposta) {
+//         return response.json({
+//             mensagem: "Usuário não encontrado"
+//         })
+//     }
+//     return response.json({
+//         mensagem: "Usuário encontrado",
+//         prestador: resposta
+//     })
+// }
 const prestadorSchema = z.object({
     nome: z.string().trim().min(2, "O nome deve ter pelo menos 2 caracteres"),
     cpf: z.string().transform(valor => valor.replace(/\D/g, "")).pipe(z.string().regex(/^\d{11}$/, "CPF deve conter 11 dígitos")),
@@ -24,14 +29,14 @@ const prestadorSchema = z.object({
     senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
 });
 export const criarPrestadorController = async (request, response) => {
-    const user = prestadorSchema.safeParse(request.body);
-    if (!user.success) {
+    const prestador = prestadorSchema.safeParse(request.body);
+    if (!prestador.success) {
         return response.status(400).json({
             mensagem: "Campos inválidos",
-            erro: user.error.format()
+            erro: prestador.error.format()
         });
     }
-    const resposta = await criarPrestador(user.data);
+    const resposta = await criarPrestador(prestador.data);
     if (!resposta) {
         return response.status(409).json({
             mensagem: "Prestador já existe"
@@ -41,25 +46,43 @@ export const criarPrestadorController = async (request, response) => {
         mensagem: "Prestador cadastrado com sucesso",
     });
 };
-export const pegarTodosPrestadoresController = async (request, response) => {
-    const prestadores = await pegarTodosPrestadores();
-    if (prestadores.length === 0) {
-        return response.status(200).json({
-            mensagem: "Não existe nenhum prestador cadastrado"
+// export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
+//     const prestadores = await pegarTodosPrestadores();
+//     if(prestadores.length === 0){
+//         return response.status(200).json({
+//             mensagem: "Não existe nenhum prestador cadastrado"
+//         })
+//     }
+//     return response.json({
+//         prestadores
+//     })
+// }
+const atualizarPrestadorSchema = z.object({
+    email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
+    telefone: z.string().transform(valor => valor.replace(/\D/g, ""))
+        .pipe(z.string().regex(/^\d{10,11}$/, "Telefone deve conter 10 ou 11 dígitos")),
+    estabelecimento: z.string().trim()
+        .min(2, "Informe o nome do estabelecimento"),
+    senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
+});
+export const atualizarPrestadorController = async (request, response) => {
+    const id = Number(request.usuario?.id);
+    const prestador = atualizarPrestadorSchema.safeParse(request.body);
+    if (!Number.isInteger(id) || id <= 0) {
+        return response.status(400).json({
+            mensagem: "Número de ID inválido"
         });
     }
-    return response.json({
-        prestadores
-    });
-};
-export const atualizarPrestadorController = async (request, response) => {
-    const id = Number(request.params.id);
-    const user = request.body;
-    const resposta = await atuaizarPrestador(id, user);
+    if (!prestador.success) {
+        return response.status(400).json({
+            mensagem: "Dados do prestador inválidos"
+        });
+    }
+    const resposta = await atuaizarPrestador(id, prestador.data);
     if (resposta) {
         return response.status(200).json({
             mensagem: "Prestador atualizado",
-            prestador: user
+            prestador: prestador
         });
     }
     else {
@@ -69,7 +92,12 @@ export const atualizarPrestadorController = async (request, response) => {
     }
 };
 export const deletarPrestadorController = async (request, response) => {
-    const id = Number(request.params.id);
+    const id = Number(request.usuario?.id);
+    if (!Number.isInteger(id) || id <= 0) {
+        return response.status(400).json({
+            mensagem: "Número de ID inválido"
+        });
+    }
     const resposta = await deletarPrestador(id);
     if (resposta) {
         return response.status(200).json({
@@ -82,15 +110,24 @@ export const deletarPrestadorController = async (request, response) => {
         });
     }
 };
+const loginSchema = z.object({
+    email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
+    senha: z.string().min(8, "A senha deve ter pelo menos 8 caracteres")
+});
 export const loginControler = async (request, response) => {
-    const { email, senha } = request.body;
+    const userLogin = loginSchema.safeParse(request.body);
+    if (!userLogin.success) {
+        return response.status(400).json({
+            mensagem: "Dados do prestador inválidos"
+        });
+    }
+    const { email, senha } = userLogin.data;
     const resposta = await loginService(email, senha);
     if (!resposta) {
         return response.status(400).json({
             mensagem: "E-mail ou senha inválidos"
         });
     }
-    // const { user, token } = resposta
     return response.json({
         resposta
     });

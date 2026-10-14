@@ -1,19 +1,13 @@
-import { gerarTokenCliente } from "../auth/gerarToken.js";
-import { clientes, NovoCliente } from "../data/clientes.js";
-import { ordenServicos } from "../data/ordens.js"
 import { AppDataSource } from "../DataSource.js";
-import { Cliente } from "../entitys/clientes.js";
 import { Ordens } from "../entitys/ordens.js";
 import { NotificacaoEntity } from "../entitys/notification.js";
-import { StatusOS, TypeOrdem, TypeOrdemRequest } from "../types/TypeOrdem.js";
+import { TypeOrdemRequest } from "../types/TypeOrdem.js";
 import { BuscarCliente, CriarCliente } from "./clienteService.js";
-import { In, Not } from "typeorm";
+import { In } from "typeorm";
 import { enviarEmailCodigoAcesso } from "./emailService.js";
+import { notificationCreateOrder, notificationUpdateStatus } from "./notificationService.js";
 
 const ordensBanco = AppDataSource.getRepository(Ordens);
-export const clientesBanco = AppDataSource.getRepository(Cliente);
-const notificationDate = AppDataSource.getRepository(NotificacaoEntity)
-
 
 export const pegarTodasOrderns = async (prestadorId: number) => {
 
@@ -21,10 +15,10 @@ export const pegarTodasOrderns = async (prestadorId: number) => {
         where: {
             prestadorId: prestadorId
         },
-            relations: {
-                cliente: true,
-                notificacao: true 
-            },
+        relations: {
+            cliente: false,
+            notificacao: false
+        },
     })
 
     return ordens
@@ -39,7 +33,7 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
             where: {
                 status: status,
                 prestadorId: prestadorId
-            }
+            },
         })
     } else {
         ordens = await ordensBanco.find({
@@ -69,49 +63,34 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
 }
 
 export const adcOrdem = async (ordem: TypeOrdemRequest, prestadorId: number) => {
-    let cliente;
     const usuarioBuscado = await BuscarCliente(ordem.cpf);
 
-    if (!usuarioBuscado) {
-        const newUser: NovoCliente = {
-            nome: ordem.nome,
-            cpf: ordem.cpf,
-            telefone: ordem.telefone
-        }
-        const user = await CriarCliente(newUser);
+    const cliente = usuarioBuscado ?? await CriarCliente({
+        nome: ordem.nome,
+        cpf: ordem.cpf,
+        telefone: ordem.telefone
+    })
 
-        cliente = user
-    } else {
-        cliente = usuarioBuscado
+    if (!cliente) {
+        throw new Error("Não foi possível encontrar ou criar o cliente");
     }
 
+
     const novaOrdem = ordensBanco.create({
-        // nome: cliente.nome,
-        // cpf: cliente.cpf,
-        // telefone: cliente.telefone,
         prestadorId: prestadorId,
-        clienteId: cliente!.id,
+        clienteId: cliente.id,
         placa: ordem.placa,
         dataCriacao: new Date(),
         tipoServico: ordem.tipoServico,
         status: ordem.status,
-        // codAcesso: cliente.codAcesso
     })
-
-
 
     const ordemSalva = await ordensBanco.save(novaOrdem);
-    const criarNotificacao = notificationDate.create({
-        titulo: "NOVA ORDEM CRIADA",
-        descricao: `Nova ordem cadastrada para o cliente ${cliente?.nome}`,
-        data: new Date(),
-        status: ordemSalva.status,
-        ordemId: ordemSalva.id
-    })
 
-    await notificationDate.save(criarNotificacao)
+    await notificationCreateOrder(cliente.nome, ordemSalva.status, ordemSalva.id)
 
-    enviarEmailCodigoAcesso("teste@gmail.com", cliente?.nome, cliente?.codAcesso)
+    await enviarEmailCodigoAcesso("teste@gmail.com", cliente.nome, cliente.codAcesso)
+
     return ordemSalva
 }
 
@@ -122,9 +101,13 @@ export const attStatus = async (id: number, prestadorId: number) => {
             id: id,
             prestadorId: prestadorId
         }
-     });
+    });
 
     if (!ordem) {
+        return null
+    }
+
+    if(ordem.status === "Finalizado"){
         return null
     }
 
@@ -133,26 +116,19 @@ export const attStatus = async (id: number, prestadorId: number) => {
     ordem.status = novoStatus
 
     await ordensBanco.save(ordem)
-    const criarNotificacao = notificationDate.create({
-        titulo: "MUDANÇA DE STATUS",
-        descricao: `A ordem cadastrada para o cliente ${ordem?.cliente.nome} mudou de status`,
-        data: new Date(),
-        status: ordem.status,
-        ordemId: ordem.id
-    })
 
-    await notificationDate.insert(criarNotificacao)
+    await notificationUpdateStatus(ordem.cliente.nome, ordem.status, ordem.id);
 
     return ordem
 }
 
 export const excluirOrdem = async (id: number, prestadorId: number) => {
-    const ordem = await ordensBanco.findOne({ 
+    const ordem = await ordensBanco.findOne({
         where: {
             id: id,
             prestadorId: prestadorId
         }
-     });
+    });
 
     if (!ordem) {
         return null
@@ -160,43 +136,4 @@ export const excluirOrdem = async (id: number, prestadorId: number) => {
 
     await ordensBanco.remove(ordem);
     return true
-}
-
-export const getOrderUser = async (codAcesso: string) => {
-    const cliente = await clientesBanco.findOneBy({ codAcesso })
-
-    if (!cliente) {
-        return null
-    }
-
-    const id = Number(cliente?.id)
-
-    const ordens = await ordensBanco.find({
-        where: {
-            clienteId: id
-        }
-    })
-
-    const ordemCliente = {
-        cliente: cliente,
-        ordens: ordens
-    }
-
-    return ordemCliente
-}
-
-export const loginClienteToken = async (code: string, cpf: string) => {
-    const cliente = await clientesBanco.findOneBy({ cpf })
-
-    if (!cliente) {
-        return null
-    }
-
-    if (cliente.codAcesso !== code) {
-        return null
-    }
-
-    const token = gerarTokenCliente(cliente)
-
-    return token
 }

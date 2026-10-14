@@ -1,4 +1,4 @@
-export interface Cliente {
+export interface TypeCliente {
     nome: string;
     cpf: string;
     telefone: string;

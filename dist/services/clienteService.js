@@ -1,8 +1,9 @@
 import { gerarTokenCliente } from "../auth/gerarToken.js";
 import { AppDataSource } from "../DataSource.js";
+import { Cliente } from "../entitys/clientes.js";
 import { Ordens } from "../entitys/ordens.js";
-import { clientesBanco } from "./ordemService.js";
 const ordensBanco = AppDataSource.getRepository(Ordens);
+const clientesBanco = AppDataSource.getRepository(Cliente);
 export const gerarCodigoAleatorio = () => {
     const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let codigo = "";

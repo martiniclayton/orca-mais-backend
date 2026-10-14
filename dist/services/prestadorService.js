@@ -34,10 +34,10 @@ export const atuaizarPrestador = async (id, novosDados) => {
         return null;
     }
     ;
-    prestador.nome = novosDados.nome;
-    prestador.cpf = novosDados.cpf;
     prestador.email = novosDados.email;
     prestador.telefone = novosDados.telefone;
+    prestador.estabelecimento = novosDados.estabelecimento;
+    prestador.senha = novosDados.senha;
     return await prestadores.save(prestador);
 };
 export const deletarPrestador = async (id) => {
@@ -78,7 +78,7 @@ export const loginService = async (email, senha) => {
         prestador: {
             id: prestador.id,
             nome: prestador.nome,
-            enail: prestador.email,
+            email: prestador.email,
             estabelecimento: prestador.estabelecimento
         },
         token: token

@@ -2,7 +2,15 @@ import { getAllNotificationService, getNotificationUserService } from "../servic
 import { Request, Response } from 'express'
 
 export const getAllNotification = async (request: Request, response: Response) =>{
-    const resposta = await getAllNotificationService()
+    const prestadorId = Number(request.usuario?.id);
+
+    if(!Number.isInteger(prestadorId) || prestadorId <=0){
+        return response.status(400).json({
+            mensagem: "ID inválido"
+        })
+    }
+
+    const resposta = await getAllNotificationService(prestadorId)
 
     if(resposta.length === 0){
         return response.json({

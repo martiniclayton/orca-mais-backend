@@ -32,7 +32,7 @@ __decorate([
     __metadata("design:type", String)
 ], Cliente.prototype, "telefone", void 0);
 __decorate([
-    Column({ type: "varchar", select: true }),
+    Column({ type: "varchar", select: false }),
     __metadata("design:type", String)
 ], Cliente.prototype, "codAcesso", void 0);
 Cliente = __decorate([
