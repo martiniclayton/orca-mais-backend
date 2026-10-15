@@ -1,6 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { EntityPrestador } from "./Prestador.js";
 
 @Entity("Cliente")
+@Index(['cpf', 'prestadorId'], {unique: true})
 export class Cliente {
     @PrimaryGeneratedColumn()
     id!: number
@@ -8,7 +10,7 @@ export class Cliente {
     @Column({type: "varchar"})
     nome!: string
 
-    @Column({type: "varchar", unique: true, select: false})
+    @Column({type: "varchar", select: false})
     cpf!: string
 
     @Column({type: "varchar", select: true})
@@ -16,4 +18,11 @@ export class Cliente {
 
     @Column({type: "varchar", select: false})
     codAcesso!: string
+
+    @Column({type: "int"})
+    prestadorId: number
+
+    @ManyToOne(() => EntityPrestador)
+    @JoinColumn({name: "prestadorId"})
+    prestador!: EntityPrestador
 }

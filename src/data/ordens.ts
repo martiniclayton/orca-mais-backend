@@ -1,5 +1,4 @@
 import { TypeOrdem } from "../types/TypeOrdem.js";
-import { clientes } from "./clientes.js";
 
 export const ordenServicos: TypeOrdem[] = [
 

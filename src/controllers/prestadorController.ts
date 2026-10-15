@@ -1,32 +1,6 @@
-import { atuaizarPrestador, buscarPrestador, criarPrestador, deletarPrestador, loginService, pegarTodosPrestadores } from "../services/prestadorService.js"
+import { atuaizarPrestador, criarPrestador, deletarPrestador, loginService } from "../services/prestadorService.js"
 import type { Request, Response } from "express";
-import { email, z } from 'zod';
-import { gerarToken } from "../auth/gerarToken.js";
-
-
-// export const buscarPrestadorPorIdController = async (request: Request, response: Response) => {
-
-//     const id = Number(request.params.id);
-
-//     if(!Number.isInteger(id) || id <=0){
-//         return response.status(400).json({
-//             mensagem: "Número de ID inválido"
-//         })
-//     }
-
-//     const resposta = await buscarPrestador(id)
-
-//     if (!resposta) {
-//         return response.json({
-//             mensagem: "Usuário não encontrado"
-//         })
-//     }
-
-//     return response.json({
-//         mensagem: "Usuário encontrado",
-//         prestador: resposta
-//     })
-// }
+import { z } from 'zod';
 
 const prestadorSchema = z.object({
     nome: z.string().trim().min(2, "O nome deve ter pelo menos 2 caracteres"),
@@ -67,20 +41,6 @@ export const criarPrestadorController = async (request: Request, response: Respo
     })
 }
 
-// export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
-//     const prestadores = await pegarTodosPrestadores();
-
-//     if(prestadores.length === 0){
-//         return response.status(200).json({
-//             mensagem: "Não existe nenhum prestador cadastrado"
-//         })
-//     }
-
-//     return response.json({
-//         prestadores
-//     })
-// }
-
 const atualizarPrestadorSchema = z.object({
     email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
     telefone: z.string().transform(valor => valor.replace(/\D/g, ""))
@@ -116,7 +76,7 @@ export const atualizarPrestadorController = async (request: Request, response: R
     if (resposta) {
         return response.status(200).json({
             mensagem: "Prestador atualizado",
-            prestador: prestador
+            prestador: prestador.data
         })
     } else {
         return response.status(404).json({

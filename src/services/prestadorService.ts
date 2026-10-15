@@ -51,12 +51,16 @@ export const atuaizarPrestador = async (id: number, novosDados: TypeAtualizarPre
         return null
     };
 
+    const senhahash = await bcrypt.hash(novosDados.senha, 10)
+
     prestador.email = novosDados.email
     prestador.telefone = novosDados.telefone
     prestador.estabelecimento = novosDados.estabelecimento
-    prestador.senha = novosDados.senha
+    prestador.senha = senhahash
 
-    return await prestadores.save(prestador)
+    await prestadores.save(prestador)
+
+    return true
 
 }
 
@@ -98,10 +102,6 @@ export const loginService = async (email: string, senha: string) => {
      if(!senhaValida){
         return
      }
-
-    //  if(prestador.senha !== senha){
-    //     return null
-    //  }
 
      const token = gerarToken(prestador)
 

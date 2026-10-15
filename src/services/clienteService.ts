@@ -1,9 +1,8 @@
 import { gerarTokenCliente } from "../auth/gerarToken.js";
-import { NovoCliente } from "../data/clientes.js"
 import { AppDataSource } from "../DataSource.js";
 import { Cliente } from "../entitys/clientes.js";
 import { Ordens } from "../entitys/ordens.js";
-import {TypeCliente } from "../types/TypeCliente.js";
+import {NovoCliente, TypeCliente } from "../types/TypeCliente.js";
 
 const ordensBanco = AppDataSource.getRepository(Ordens);
 const clientesBanco = AppDataSource.getRepository(Cliente);
@@ -45,9 +44,8 @@ export const getClienteService =  async(codigo: number) =>{
             id: codigo
         },
         select:{
-            codAcesso: true,
-            id: false,
             nome: true,
+            codAcesso: true,
             telefone: true
         }
     })
@@ -59,10 +57,13 @@ export const getClienteService =  async(codigo: number) =>{
     return cliente
 }
 
-export const getOrdersUserUserService = (clienteId: number) =>{
-    const ordens = ordensBanco.find({
+export const getOrdersUserUserService =  async (clienteId: number) =>{
+    const ordens = await ordensBanco.find({
         where: {
             clienteId: clienteId
+        },
+        relations: {
+            cliente: true
         }
     })
 
@@ -73,12 +74,11 @@ export const getOrdersUserUserService = (clienteId: number) =>{
     return ordens
 }
 
-export const BuscarCliente = async (cpf: string)=>{
-    // const user =  await clientesBanco.findOneBy({cpf});
-
+export const BuscarCliente = async (cpf: string, prestadorId: number)=>{
     const user = await clientesBanco.findOne({
         where: {
-            cpf: cpf
+            cpf: cpf,
+            prestadorId: prestadorId
         },
         select: {
             id: true,
@@ -91,17 +91,21 @@ export const BuscarCliente = async (cpf: string)=>{
     return user
 }
 
-export const CriarCliente =  async({ nome, cpf, telefone }: NovoCliente) =>{
+export const CriarCliente =  async({ nome, cpf, telefone, prestadorId }: NovoCliente) =>{
     const user: TypeCliente = {
         nome: nome,
         cpf: cpf,
         telefone: telefone,
-        codAcesso: gerarCodigoAleatorio()
+        codAcesso: gerarCodigoAleatorio(),
+        prestadorId: prestadorId
     }
 
     const novoCliente = await clientesBanco.create(user)
 
     await clientesBanco.save(novoCliente);
 
-    return await clientesBanco.findOneBy({cpf})
+    return await clientesBanco.findOneBy({
+        cpf: cpf,
+        prestadorId: prestadorId
+    })
 }

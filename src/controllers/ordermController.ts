@@ -1,4 +1,4 @@
-import { adcOrdem, attStatus, excluirOrdem, filtrarOrdensFinalizadas, pegarTodasOrderns } from "../services/ordemService.js"
+import { adcOrdem, attStatus, excluirOrdem, filtrarOrdens, pegarTodasOrderns } from "../services/ordemService.js"
 import { Request, Response } from "express";
 import { z } from "zod";
 
@@ -26,7 +26,7 @@ export const getAllorders = async (request: Request, response: Response) => {
     }
 
     if (statusValue.success) {
-        const resposta = await filtrarOrdensFinalizadas(statusValue.data, prestadorId)
+        const resposta = await filtrarOrdens(statusValue.data, prestadorId)
         return response.status(200).json({
             mensagem: "Ordens Finalizadas",
             ordens: resposta

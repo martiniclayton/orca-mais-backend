@@ -16,15 +16,26 @@ export const pegarTodasOrderns = async (prestadorId: number) => {
             prestadorId: prestadorId
         },
         relations: {
-            cliente: false,
+            cliente: true,
             notificacao: false
         },
+        select:{
+            cliente: {
+                nome: true,
+                telefone: true
+            },
+            id: true,
+            tipoServico: true,
+            placa: true,
+            status: true
+
+        }
     })
 
     return ordens
 }
 
-export const filtrarOrdensFinalizadas = async (status: string, prestadorId: number) => {
+export const filtrarOrdens = async (status: string, prestadorId: number) => {
 
     let ordens;
 
@@ -34,27 +45,34 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
                 status: status,
                 prestadorId: prestadorId
             },
+            relations: {
+                cliente: true
+            },
+            select: {
+                cliente:{
+                    nome: true,
+                }
+            }
         })
-    } else {
+    } else if(status === "Ativos") {
         ordens = await ordensBanco.find({
             where: {
                 status: In(["Em andamento", "Pronto para retirada"]),
                 prestadorId: prestadorId
             },
-            select: {
+            relations:{
+                cliente: true
+            },
+            select:{
                 cliente: {
-                    codAcesso: false,
-                    id: false,
                     nome: true,
-                    telefone: false
                 },
-                clienteId: false,
-                dataCriacao: true,
-                descricao: true,
                 id: true,
+                tipoServico: true,
                 placa: true,
-                status: true,
-                tipoServico: true
+                dataCriacao: true,
+                status: true
+
             }
         })
     }
@@ -63,12 +81,13 @@ export const filtrarOrdensFinalizadas = async (status: string, prestadorId: numb
 }
 
 export const adcOrdem = async (ordem: TypeOrdemRequest, prestadorId: number) => {
-    const usuarioBuscado = await BuscarCliente(ordem.cpf);
+    const usuarioBuscado = await BuscarCliente(ordem.cpf, prestadorId);
 
     const cliente = usuarioBuscado ?? await CriarCliente({
         nome: ordem.nome,
         cpf: ordem.cpf,
-        telefone: ordem.telefone
+        telefone: ordem.telefone,
+        prestadorId: prestadorId
     })
 
     if (!cliente) {
@@ -100,6 +119,14 @@ export const attStatus = async (id: number, prestadorId: number) => {
         where: {
             id: id,
             prestadorId: prestadorId
+        },
+        relations: {
+            cliente: true
+        },
+        select:{
+            cliente:{
+                nome: true
+            }
         }
     });
 

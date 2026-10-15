@@ -17,7 +17,7 @@ export class Ordens {
     @ManyToOne(() => EntityPrestador, {nullable: false})
     prestador!: EntityPrestador
 
-    @ManyToOne(()=> Cliente, { eager: true})
+    @ManyToOne(()=> Cliente)
     @JoinColumn({name: "clienteId"})
     cliente!: Cliente
 

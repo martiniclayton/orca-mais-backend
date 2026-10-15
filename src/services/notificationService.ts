@@ -1,6 +1,5 @@
 import { AppDataSource } from "../DataSource.js"
 import { NotificacaoEntity } from "../entitys/notification.js"
-import { StatusOS } from "../types/TypeOrdem.js"
 
 export const notificacoesData = AppDataSource.getRepository(NotificacaoEntity)
 
@@ -11,21 +10,20 @@ export const getAllNotificationService = async (prestadorId: number) => {
                 prestadorId: prestadorId
             }
         },
+        relations: {
+            ordens: {
+                cliente: true
+            },
+        },
         select: {
             data: true,
             descricao: true,
             id: true,
-            ordemId: false,
             ordens: {
                 cliente: {
-                    codAcesso: false,
-                    id: false,
                     nome: true,
-                    telefone: false
                 },
                 dataCriacao: true,
-                descricao: false,
-                id: false,
                 placa: true,
                 status: true,
                 tipoServico: true
@@ -39,13 +37,30 @@ export const getAllNotificationService = async (prestadorId: number) => {
 }
 
 export const getNotificationUserService = async (cod: number) => {
-    const notifications = notificacoesData.find({
+    const notifications =  await notificacoesData.find({
         where: {
             ordens: {
                 cliente: {
                     id: cod
                 }
             }
+        },
+        relations:{
+            ordens: {
+                cliente: true
+            }
+        },
+        select:{
+            data: true,
+            ordens: {
+                placa: true,
+                tipoServico: true,
+                cliente:{
+                    nome: true
+                }
+            },
+            status: true,
+            titulo: true
         }
     })
 
@@ -53,7 +68,7 @@ export const getNotificationUserService = async (cod: number) => {
 }
 
 export const notificationCreateOrder = async (cliente: string, status: string, ordemId: number) => {
-    const criarNotificacao = notificacoesData.create({
+    const criarNotificacao = await notificacoesData.create({
         titulo: "NOVA ORDEM CRIADA",
         descricao: `Nova ordem cadastrada para o cliente ${cliente}`,
         data: new Date(),
@@ -65,7 +80,7 @@ export const notificationCreateOrder = async (cliente: string, status: string, o
 }
 
 export const notificationUpdateStatus = async (cliente: string, status: string, ordenId: number) => {
-    const criarNotificacao = notificacoesData.create({
+    const criarNotificacao = await notificacoesData.create({
         titulo: "MUDANÇA DE STATUS",
         descricao: `A ordem cadastrada para o cliente ${cliente} mudou de status`,
         data: new Date(),

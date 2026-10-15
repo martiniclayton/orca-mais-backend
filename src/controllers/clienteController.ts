@@ -3,8 +3,8 @@ import { getClienteService, getOrdersUserUserService, loginClienteService } from
 import z from "zod";
 
 const clienteSchema = z.object({
-    code: z.string(),
-    cpf: z.string()
+    code: z.string().trim().min(2),
+    cpf: z.string().trim().min(1)
 })
 
 export const loginClienteController = async (request: Request, response: Response) =>{
@@ -22,11 +22,13 @@ export const loginClienteController = async (request: Request, response: Respons
 
     if(!resposta){
         return response.status(404).json({
-            mensagem: "Cliente não encontrado"
+            mensagem: "Cliente não encontrado",
+            token: null
         })
     }
 
     return response.status(200).json({
+        mensagem: "Cliente buscado com sucesso",
         token: resposta
     })
 }
@@ -44,7 +46,8 @@ export const getCliente = async (request: Request, response: Response) =>{
 
     if(!resposta){
         return response.status(404).json({
-            mensagem: "Cliente não encontrado"
+            mensagem: "Cliente não encontrado",
+            cliente: null
         })
     }
 
@@ -63,17 +66,24 @@ export const getOrdersUserUser = async (request: Request, response: Response) =>
         })
     }
 
-    const resposta = await getOrdersUserUserService(clienteId)
+    const ordens = await getOrdersUserUserService(clienteId)
 
-    if(!resposta){
+    if(!ordens){
         return response.status(404).json({
             mensagem: "Ordens não encontradas"
+        })
+    }
+
+    if(ordens?.length === 0){
+        return response.status(200).json({
+            mensagem: "Nenhuma ordem encontrada",
+            ordens: []
         })
     }
     
     return response.status(200).json({
         mensagem: "Ordens Cliente",
-        cliente: resposta[0]?.cliente,
-        ordens: resposta
+        cliente: ordens[0]?.cliente,
+        ordens: ordens
     })
 }
