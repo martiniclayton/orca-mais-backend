@@ -1,23 +1,5 @@
 import { atuaizarPrestador, criarPrestador, deletarPrestador, loginService } from "../services/prestadorService.js";
 import { z } from 'zod';
-// export const buscarPrestadorPorIdController = async (request: Request, response: Response) => {
-//     const id = Number(request.params.id);
-//     if(!Number.isInteger(id) || id <=0){
-//         return response.status(400).json({
-//             mensagem: "Número de ID inválido"
-//         })
-//     }
-//     const resposta = await buscarPrestador(id)
-//     if (!resposta) {
-//         return response.json({
-//             mensagem: "Usuário não encontrado"
-//         })
-//     }
-//     return response.json({
-//         mensagem: "Usuário encontrado",
-//         prestador: resposta
-//     })
-// }
 const prestadorSchema = z.object({
     nome: z.string().trim().min(2, "O nome deve ter pelo menos 2 caracteres"),
     cpf: z.string().transform(valor => valor.replace(/\D/g, "")).pipe(z.string().regex(/^\d{11}$/, "CPF deve conter 11 dígitos")),
@@ -46,17 +28,6 @@ export const criarPrestadorController = async (request, response) => {
         mensagem: "Prestador cadastrado com sucesso",
     });
 };
-// export const pegarTodosPrestadoresController = async (request: Request, response: Response) => {
-//     const prestadores = await pegarTodosPrestadores();
-//     if(prestadores.length === 0){
-//         return response.status(200).json({
-//             mensagem: "Não existe nenhum prestador cadastrado"
-//         })
-//     }
-//     return response.json({
-//         prestadores
-//     })
-// }
 const atualizarPrestadorSchema = z.object({
     email: z.string().trim().toLowerCase().pipe(z.email("E-mail inválido")),
     telefone: z.string().transform(valor => valor.replace(/\D/g, ""))
@@ -82,7 +53,7 @@ export const atualizarPrestadorController = async (request, response) => {
     if (resposta) {
         return response.status(200).json({
             mensagem: "Prestador atualizado",
-            prestador: prestador
+            prestador: prestador.data
         });
     }
     else {

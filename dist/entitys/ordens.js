@@ -41,7 +41,7 @@ __decorate([
     __metadata("design:type", EntityPrestador)
 ], Ordens.prototype, "prestador", void 0);
 __decorate([
-    ManyToOne(() => Cliente, { eager: true }),
+    ManyToOne(() => Cliente),
     JoinColumn({ name: "clienteId" }),
     __metadata("design:type", Cliente)
 ], Ordens.prototype, "cliente", void 0);

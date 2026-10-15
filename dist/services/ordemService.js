@@ -11,13 +11,23 @@ export const pegarTodasOrderns = async (prestadorId) => {
             prestadorId: prestadorId
         },
         relations: {
-            cliente: false,
+            cliente: true,
             notificacao: false
         },
+        select: {
+            cliente: {
+                nome: true,
+                telefone: true
+            },
+            id: true,
+            tipoServico: true,
+            placa: true,
+            status: true
+        }
     });
     return ordens;
 };
-export const filtrarOrdensFinalizadas = async (status, prestadorId) => {
+export const filtrarOrdens = async (status, prestadorId) => {
     let ordens;
     if (status === "Finalizado") {
         ordens = await ordensBanco.find({
@@ -25,39 +35,46 @@ export const filtrarOrdensFinalizadas = async (status, prestadorId) => {
                 status: status,
                 prestadorId: prestadorId
             },
+            relations: {
+                cliente: true
+            },
+            select: {
+                cliente: {
+                    nome: true,
+                }
+            }
         });
     }
-    else {
+    else if (status === "Ativos") {
         ordens = await ordensBanco.find({
             where: {
                 status: In(["Em andamento", "Pronto para retirada"]),
                 prestadorId: prestadorId
             },
+            relations: {
+                cliente: true
+            },
             select: {
                 cliente: {
-                    codAcesso: false,
-                    id: false,
                     nome: true,
-                    telefone: false
                 },
-                clienteId: false,
-                dataCriacao: true,
-                descricao: true,
                 id: true,
+                tipoServico: true,
                 placa: true,
-                status: true,
-                tipoServico: true
+                dataCriacao: true,
+                status: true
             }
         });
     }
     return ordens;
 };
 export const adcOrdem = async (ordem, prestadorId) => {
-    const usuarioBuscado = await BuscarCliente(ordem.cpf);
+    const usuarioBuscado = await BuscarCliente(ordem.cpf, prestadorId);
     const cliente = usuarioBuscado ?? await CriarCliente({
         nome: ordem.nome,
         cpf: ordem.cpf,
-        telefone: ordem.telefone
+        telefone: ordem.telefone,
+        prestadorId: prestadorId
     });
     if (!cliente) {
         throw new Error("Não foi possível encontrar ou criar o cliente");
@@ -80,6 +97,14 @@ export const attStatus = async (id, prestadorId) => {
         where: {
             id: id,
             prestadorId: prestadorId
+        },
+        relations: {
+            cliente: true
+        },
+        select: {
+            cliente: {
+                nome: true
+            }
         }
     });
     if (!ordem) {

@@ -3,7 +3,7 @@ import { NovoPrestador, TypeAtualizarPrestador } from "../types/TypePrestador.js
 export declare const buscarPrestador: (id: number) => Promise<EntityPrestador | null>;
 export declare const criarPrestador: (prestador: NovoPrestador) => Promise<EntityPrestador | null>;
 export declare const pegarTodosPrestadores: () => Promise<EntityPrestador[]>;
-export declare const atuaizarPrestador: (id: number, novosDados: TypeAtualizarPrestador) => Promise<EntityPrestador | null>;
+export declare const atuaizarPrestador: (id: number, novosDados: TypeAtualizarPrestador) => Promise<true | null>;
 export declare const deletarPrestador: (id: number) => Promise<true | null>;
 export declare const loginService: (email: string, senha: string) => Promise<{
     prestador: {

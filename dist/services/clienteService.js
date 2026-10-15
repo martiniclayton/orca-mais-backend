@@ -32,9 +32,8 @@ export const getClienteService = async (codigo) => {
             id: codigo
         },
         select: {
-            codAcesso: true,
-            id: false,
             nome: true,
+            codAcesso: true,
             telefone: true
         }
     });
@@ -43,10 +42,13 @@ export const getClienteService = async (codigo) => {
     }
     return cliente;
 };
-export const getOrdersUserUserService = (clienteId) => {
-    const ordens = ordensBanco.find({
+export const getOrdersUserUserService = async (clienteId) => {
+    const ordens = await ordensBanco.find({
         where: {
             clienteId: clienteId
+        },
+        relations: {
+            cliente: true
         }
     });
     if (!ordens) {
@@ -54,11 +56,11 @@ export const getOrdersUserUserService = (clienteId) => {
     }
     return ordens;
 };
-export const BuscarCliente = async (cpf) => {
-    // const user =  await clientesBanco.findOneBy({cpf});
+export const BuscarCliente = async (cpf, prestadorId) => {
     const user = await clientesBanco.findOne({
         where: {
-            cpf: cpf
+            cpf: cpf,
+            prestadorId: prestadorId
         },
         select: {
             id: true,
@@ -70,15 +72,19 @@ export const BuscarCliente = async (cpf) => {
     });
     return user;
 };
-export const CriarCliente = async ({ nome, cpf, telefone }) => {
+export const CriarCliente = async ({ nome, cpf, telefone, prestadorId }) => {
     const user = {
         nome: nome,
         cpf: cpf,
         telefone: telefone,
-        codAcesso: gerarCodigoAleatorio()
+        codAcesso: gerarCodigoAleatorio(),
+        prestadorId: prestadorId
     };
     const novoCliente = await clientesBanco.create(user);
     await clientesBanco.save(novoCliente);
-    return await clientesBanco.findOneBy({ cpf });
+    return await clientesBanco.findOneBy({
+        cpf: cpf,
+        prestadorId: prestadorId
+    });
 };
 //# sourceMappingURL=clienteService.js.map

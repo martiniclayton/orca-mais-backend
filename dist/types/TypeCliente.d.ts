@@ -3,5 +3,7 @@ export interface TypeCliente {
     cpf: string;
     telefone: string;
     codAcesso: string;
+    prestadorId: number;
 }
+export type NovoCliente = Omit<TypeCliente, "codAcesso">;
 //# sourceMappingURL=TypeCliente.d.ts.map
