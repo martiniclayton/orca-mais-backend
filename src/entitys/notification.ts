@@ -13,7 +13,7 @@ export class NotificacaoEntity {
     @Column({type: "varchar"})
     descricao!: string
 
-    @Column({type: "date"})
+    @Column({type: "timestamptz"})
     data!: Date
 
     @Column({type: "int", nullable: true})
