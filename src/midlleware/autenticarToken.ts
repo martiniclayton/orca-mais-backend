@@ -15,27 +15,25 @@ interface PayloadToken {
 export const authToken = (tipoPermitido: tipoUsuario) => {
     return (request: Request, response: Response, next: NextFunction) => {
 
-        const authorization = request.headers.authorization;
+        const token = tipoPermitido === "prestador" ? request.cookies?.tokenTrack : request.cookies?.tokenClienteTrack;
 
-        if (!authorization) {
+        if (!token) {
             return response.status(401).json({
                 mensagem: "Token não informado"
             });
         }
 
-        const [, token] = authorization.split(" ");
+        // const [, token] = authorization.split(" ");
 
-        if (!token) {
-            return response.status(401).json({
-                mensagem: "Token inválido"
-            })
-        }
+        // if (!token) {
+        //     return response.status(401).json({
+        //         mensagem: "Token inválido"
+        //     })
+        // }
 
 
         try {
             const payload = jwt.verify(token, SECRETKEY) as PayloadToken;
-
-            console.log(payload);
 
             if (typeof payload === "string" || payload.tipo !== tipoPermitido) {
                 return response.status(403).json({

@@ -3,4 +3,6 @@ export declare const criarPrestadorController: (request: Request, response: Resp
 export declare const atualizarPrestadorController: (request: Request, response: Response) => Promise<Response<any, Record<string, any>>>;
 export declare const deletarPrestadorController: (request: Request, response: Response) => Promise<Response<any, Record<string, any>>>;
 export declare const loginControler: (request: Request, response: Response) => Promise<Response<any, Record<string, any>>>;
+export declare const logoutController: (request: Request, response: Response) => Response<any, Record<string, any>>;
+export declare const verificarSessaoPrestador: (request: Request, response: Response) => Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=prestadorController.d.ts.map

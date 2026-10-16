@@ -7,11 +7,22 @@ import { AppDataSource } from './DataSource.js';
 import cors from 'cors';
 import { notificacaoRoutes } from './routes/notificacoesRoutes.js';
 import { rotasCliente } from "./routes/clienteRoutes.js";
+import cookieParser from "cookie-parser";
 
 const server = express()
 server.use(express.json());
+server.use(cookieParser());
 
-server.use(cors())
+const origensPermitidas = [
+    "http://localhost:5173",
+    "https://orcamais-zeta.vercel.app"
+]
+
+server.use(cors({
+    origin: origensPermitidas,
+    credentials: true
+}))
+
 server.use(route)
 server.use(routeOrdem)
 server.use(notificacaoRoutes)

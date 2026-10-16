@@ -99,8 +99,32 @@ export const loginControler = async (request, response) => {
             mensagem: "E-mail ou senha inválidos"
         });
     }
+    response.cookie("tokenTrack", resposta.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 60 * 60 * 1000,
+        path: "/"
+    });
     return response.json({
         resposta
+    });
+};
+export const logoutController = (request, response) => {
+    response.clearCookie("tokenTrack", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/"
+    });
+    return response.status(200).json({
+        mensagem: "Logout realizado com sucesso"
+    });
+};
+export const verificarSessaoPrestador = async (request, response) => {
+    return response.status(200).json({
+        prestadorId: request.usuario?.id,
+        tipo: request.usuario?.tipo
     });
 };
 //# sourceMappingURL=prestadorController.js.map

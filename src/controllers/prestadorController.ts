@@ -131,7 +131,36 @@ export const loginControler = async (request: Request, response: Response) =>{
         })
     }
 
+    response.cookie("tokenTrack", resposta.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 60 * 60 * 1000,
+        path: "/"
+    });
+
     return response.json({
         resposta
+    })
+}
+
+
+export const logoutController = (request: Request, response: Response) => {
+    response.clearCookie("tokenTrack", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        path: "/"
+    });
+
+    return response.status(200).json({
+        mensagem: "Logout realizado com sucesso"
+    });
+};
+
+export const verificarSessaoPrestador = async (request: Request, response: Response) =>{
+    return response.status(200).json({
+        prestadorId: request.usuario?.id,
+        tipo: request.usuario?.tipo
     })
 }

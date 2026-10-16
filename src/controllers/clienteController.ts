@@ -7,10 +7,10 @@ const clienteSchema = z.object({
     cpf: z.string().trim().min(1)
 })
 
-export const loginClienteController = async (request: Request, response: Response) =>{
+export const loginClienteController = async (request: Request, response: Response) => {
     const clienteDados = clienteSchema.safeParse(request.body);
 
-    if(!clienteDados.success){
+    if (!clienteDados.success) {
         return response.status(400).json({
             mensagem: "Dados inválidos"
         })
@@ -20,12 +20,20 @@ export const loginClienteController = async (request: Request, response: Respons
 
     const resposta = await loginClienteService(code, cpf);
 
-    if(!resposta){
+    if (!resposta) {
         return response.status(404).json({
             mensagem: "Cliente não encontrado",
             token: null
         })
     }
+
+    response.cookie("tokenClienteTrack", resposta, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 60 * 60 * 1000,
+        path: "/"
+    });
 
     return response.status(200).json({
         mensagem: "Cliente buscado com sucesso",
@@ -33,10 +41,32 @@ export const loginClienteController = async (request: Request, response: Respons
     })
 }
 
-export const getCliente = async (request: Request, response: Response) =>{
+export const autenticarCliente = (request: Request, response: Response) =>{
+    return response.status(200).json({
+        clienteId: request.usuario?.id,
+        tipo: request.usuario?.tipo
+    })
+}
+
+export const logoutControllerCliente = (request: Request, response: Response) =>{
+    console.log("Rota de logout do cliente foi chamada!")
+    response.clearCookie("tokenClienteTrack", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 60 * 60 * 1000,
+        path: "/"
+    });
+
+    return response.status(200).json({
+        mensagem: "Logout realizado com sucesso"
+    })
+}
+
+export const getCliente = async (request: Request, response: Response) => {
     const clienteId = Number(request.usuario?.id)
 
-    if(!Number.isInteger(clienteId) || clienteId <= 0){
+    if (!Number.isInteger(clienteId) || clienteId <= 0) {
         return response.status(400).json({
             mensagem: "ID inválido"
         })
@@ -44,7 +74,7 @@ export const getCliente = async (request: Request, response: Response) =>{
 
     const resposta = await getClienteService(clienteId);
 
-    if(!resposta){
+    if (!resposta) {
         return response.status(404).json({
             mensagem: "Cliente não encontrado",
             cliente: null
@@ -57,10 +87,10 @@ export const getCliente = async (request: Request, response: Response) =>{
     })
 }
 
-export const getOrdersUserUser = async (request: Request, response: Response) =>{
+export const getOrdersUserUser = async (request: Request, response: Response) => {
     const clienteId = Number(request.usuario?.id);
 
-    if(!Number.isInteger(clienteId) || clienteId <=0){
+    if (!Number.isInteger(clienteId) || clienteId <= 0) {
         return response.status(400).json({
             mensagem: "ID inválido"
         })
@@ -68,19 +98,19 @@ export const getOrdersUserUser = async (request: Request, response: Response) =>
 
     const ordens = await getOrdersUserUserService(clienteId)
 
-    if(!ordens){
+    if (!ordens) {
         return response.status(404).json({
             mensagem: "Ordens não encontradas"
         })
     }
 
-    if(ordens?.length === 0){
+    if (ordens?.length === 0) {
         return response.status(200).json({
             mensagem: "Nenhuma ordem encontrada",
             ordens: []
         })
     }
-    
+
     return response.status(200).json({
         mensagem: "Ordens Cliente",
         cliente: ordens[0]?.cliente,
