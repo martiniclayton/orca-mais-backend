@@ -51,6 +51,7 @@ export const getNotificationUserService = async (cod: number) => {
             }
         },
         select:{
+            id: true,
             data: true,
             ordens: {
                 placa: true,
